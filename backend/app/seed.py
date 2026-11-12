@@ -158,10 +158,11 @@ def seed_knowledge(db: Session, corpus: Path = CORPUS) -> int:
     return count
 
 
-def run(dev_admin: str | None = None) -> None:  # pragma: no cover - CLI
+def run(dev_admin: str | None = None, allow_staging: bool = False) -> None:  # pragma: no cover - CLI
     s = get_settings()
-    if not s.is_dev:
-        raise SystemExit("Refusing to seed synthetic data outside development/test.")
+    if s.environment == "production" or (not s.is_dev and not (allow_staging and s.environment == "staging")):
+        raise SystemExit("Refusing to seed synthetic data outside development/test "
+                         "(staging requires --allow-staging; production is never allowed).")
     db = session_factory()()
     idsvc.sync_rbac_catalog(db)
     seed_content(db)
@@ -181,4 +182,6 @@ def run(dev_admin: str | None = None) -> None:  # pragma: no cover - CLI
 if __name__ == "__main__":  # pragma: no cover
     ap = argparse.ArgumentParser()
     ap.add_argument("--dev-admin", default=None)
-    run(ap.parse_args().dev_admin)
+    ap.add_argument("--allow-staging", action="store_true", help="seed a private staging preview (never production)")
+    a = ap.parse_args()
+    run(a.dev_admin, a.allow_staging)
