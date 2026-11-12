@@ -63,6 +63,8 @@ mako==1.4.3
     # via alembic
 markupsafe==3.0.4
     # via mako
+numpy==2.5.4
+    # via shapely
 openpyxl==3.1.5
     # via -r requirements.in
 opentelemetry-api==1.45.2
@@ -107,6 +109,8 @@ python-multipart==0.0.33
 pyyaml==6.0.3
     # via uvicorn
 redis==6.4.0
+    # via -r requirements.in
+shapely==2.2.0
     # via -r requirements.in
 sqlalchemy==2.0.57
     # via

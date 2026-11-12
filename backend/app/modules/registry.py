@@ -7,7 +7,7 @@ from __future__ import annotations
 import importlib
 
 MODULES = [
-    "identity", "audit", "platform",
+    "identity", "audit", "platform", "content", "media",
 ]
 
 
