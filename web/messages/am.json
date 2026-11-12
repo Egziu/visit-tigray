@@ -1,6 +1,12 @@
 {
-  "_meta": { "status": "machine-draft, requires native-speaker review" },
-  "brand": { "name": "ትግራይን ይጎብኙ", "tagline": "ያግኙ። ይለማመዱ። ያስታውሱ።", "home": "ወደ መነሻ ገጽ" },
+  "_meta": {
+    "status": "machine-draft, requires native-speaker review"
+  },
+  "brand": {
+    "name": "ትግራይን ይጎብኙ",
+    "tagline": "ያግኙ። ይለማመዱ። ያስታውሱ።",
+    "home": "ወደ መነሻ ገጽ"
+  },
   "common": {
     "skip": "ወደ ዋናው ይዘት ይዝለሉ",
     "loading": "በመጫን ላይ…",
@@ -41,7 +47,8 @@
     "previous": "ቀዳሚ",
     "next": "ቀጣይ",
     "empty": "እስካሁን ምንም የለም።",
-    "signInRequired": "ለመቀጠል እባክዎ ይግቡ።"
+    "signInRequired": "ለመቀጠል እባክዎ ይግቡ።",
+    "pageNotFound": "ይህ ገጽ አልተገኘም።"
   },
   "nav": {
     "destinations": "መዳረሻዎች",
@@ -261,7 +268,14 @@
     "reportReason": "ምክንያት",
     "reportDetail": "ዝርዝር (አማራጭ)",
     "reportSent": "እናመሰግናለን። አወያዮች ሪፖርቱን ይገመግማሉ።",
-    "reasons": { "spam": "አይፈለጌ መልእክት", "harassment": "ትንኮሳ", "copyright": "የቅጂ መብት", "privacy": "ግላዊነት", "misinformation": "የተሳሳተ መረጃ", "other": "ሌላ" },
+    "reasons": {
+      "spam": "አይፈለጌ መልእክት",
+      "harassment": "ትንኮሳ",
+      "copyright": "የቅጂ መብት",
+      "privacy": "ግላዊነት",
+      "misinformation": "የተሳሳተ መረጃ",
+      "other": "ሌላ"
+    },
     "saveStory": "ታሪኩን አስቀምጥ",
     "storySaved": "ተቀምጧል",
     "loadMore": "ተጨማሪ ጫን",
@@ -452,7 +466,14 @@
       "unpublished": "ያልታተሙ ለውጦች",
       "create": "ረቂቅ ፍጠር",
       "edit": "አርትዕ",
-      "tabs": { "content": "ይዘት", "details": "ዝርዝሮች", "geo": "አካባቢ", "sources": "ምንጮች", "media": "ሚዲያ", "revisions": "ክለሳዎች" },
+      "tabs": {
+        "content": "ይዘት",
+        "details": "ዝርዝሮች",
+        "geo": "አካባቢ",
+        "sources": "ምንጮች",
+        "media": "ሚዲያ",
+        "revisions": "ክለሳዎች"
+      },
       "locale": "ቋንቋ",
       "machine": "በማሽን የተፈጠረ ረቂቅ",
       "saveTranslation": "ትርጉሙን አስቀምጥ",
@@ -478,7 +499,11 @@
       "lat": "ኬክሮስ",
       "lng": "ኬንትሮስ",
       "sensitivity": "ይፋዊ ትክክለኛነት",
-      "sens": { "public": "ትክክለኛ (ይፋዊ)", "coarse": "ግምታዊ (~11 ኪ.ሜ)", "hidden": "የተደበቀ" },
+      "sens": {
+        "public": "ትክክለኛ (ይፋዊ)",
+        "coarse": "ግምታዊ (~11 ኪ.ሜ)",
+        "hidden": "የተደበቀ"
+      },
       "saveGeo": "አካባቢውን አስቀምጥ",
       "addSource": "ምንጭ ጨምር",
       "sourceTitle": "ርዕስ",
@@ -500,8 +525,17 @@
       "saved": "ተቀምጧል።",
       "none": "እስካሁን መዳረሻ የለም።"
     },
-    "translations": { "title": "የትርጉም ወረፋ", "missing": "የጎደሉ", "unreviewed": "ያልተገመገሙ", "none": "ሁሉም ትርጉሞች የተሟሉና የተገመገሙ ናቸው።" },
-    "freshness": { "title": "የይዘት ወቅታዊነት", "lead": "ያልታወቀ፣ ያልተረጋገጠ ወይም ጊዜው ያለፈ መረጃ ያላቸው መዛግብት።", "none": "ሁሉም መዛግብት ወቅታዊ ናቸው።" },
+    "translations": {
+      "title": "የትርጉም ወረፋ",
+      "missing": "የጎደሉ",
+      "unreviewed": "ያልተገመገሙ",
+      "none": "ሁሉም ትርጉሞች የተሟሉና የተገመገሙ ናቸው።"
+    },
+    "freshness": {
+      "title": "የይዘት ወቅታዊነት",
+      "lead": "ያልታወቀ፣ ያልተረጋገጠ ወይም ጊዜው ያለፈ መረጃ ያላቸው መዛግብት።",
+      "none": "ሁሉም መዛግብት ወቅታዊ ናቸው።"
+    },
     "advisories": {
       "title": "የጉዞ ማሳሰቢያዎች",
       "new": "አዲስ ማሳሰቢያ",
@@ -530,14 +564,116 @@
       "create": "ዝግጅት ፍጠር",
       "created": "ዝግጅቱ ተፈጥሯል።"
     },
-    "media": { "title": "የሚዲያ ግምገማ", "license": "ፈቃድ", "credit": "ምንጭ", "alt": "ተለዋጭ ጽሑፍ (እንግሊዝኛ)", "illustrative": "ስዕላዊ መግለጫ", "reconstruction": "ዳግም ግንባታ", "aiGenerated": "በኤአይ የተፈጠረ", "custodial": "የጠባቂዎች ፈቃድ ማጣቀሻ", "saveRights": "መብቶችን አስቀምጥ", "approve": "አጽድቅ", "reject": "ውድቅ አድርግ", "gps": "የGPS መረጃ ተወግዷል", "scan": "ቅኝት፡ {status}", "none": "የሚገመገም ሚዲያ የለም።" },
-    "moderation": { "title": "የቁጥጥር ወረፋ", "none": "ወረፋው ባዶ ነው።", "approve": "አጽድቅ", "reject": "ውድቅ አድርግ", "remove": "አስወግድ", "restore": "መልስ", "note": "የውሳኔ ማስታወሻ", "flags": "ራስ-ሰር ምልክቶች (ለምክር ብቻ)", "reports": "ሪፖርቶች" },
-    "knowledge": { "title": "የዕውቀት ማከማቻ", "lead": "ለኤአይ መሪው በምንጭ የሚተዳደሩ ሰነዶች። እያንዳንዱ ደረጃ በሰው ይገመገማል።", "upload": "ሰነድ ስቀል", "file": "ፋይል (PDF፣ TXT፣ Markdown)", "docTitle": "ርዕስ", "author": "ደራሲ", "publisher": "አሳታሚ ወይም ተቋም", "published": "የታተመበት ቀን", "language": "የመጀመሪያ ቋንቋ", "rights": "የመብት / የፈቃድ ሁኔታ", "classification": "የተደራሽነት ደረጃ", "uploadBtn": "ስቀል", "review": "እንደተገመገመ ምልክት አድርግ", "approve": "አጽድቅ", "publish": "ለፍለጋ አትም", "reject": "ውድቅ አድርግ", "none": "እስካሁን ሰነድ የለም።", "status": "ሁኔታ" },
-    "ai": { "title": "የኤአይ ፖሊሲ", "mode": "ንቁ ሁነታ", "permitted": "የተፈቀዱ ሁነታዎች", "save": "ፖሊሲውን አስቀምጥ", "models": "የሞዴል መዝገብ", "noModels": "የተመዘገበ ሞዴል የለም።", "modes": { "fully_local": "ሙሉ በሙሉ አካባቢያዊ", "local_first_cloud_fallback": "መጀመሪያ አካባቢያዊ፣ ከዚያ ደመና", "cloud_assisted": "በደመና የታገዘ", "retrieval_only": "ፍለጋ ብቻ", "deterministic": "ቋሚ ሕግ ላይ የተመሠረተ", "offline": "ከመስመር ውጭ" } },
-    "analytics": { "title": "ትንታኔ", "lead": "የድረ ገጽ ተሳትፎ እንጂ የተለካ የጎብኚዎች ብዛት አይደለም።", "from": "ከ", "to": "እስከ", "load": "ጫን", "export": "{format} አውጣ" },
-    "users": { "title": "ተጠቃሚዎችና ሚናዎች", "email": "ኢሜይል", "name": "ስም", "roles": "ሚናዎች", "mfa": "ሁለት ደረጃ", "invite": "ሠራተኛ ጋብዝ", "inviteBtn": "ግብዣ ላክ", "saveRoles": "ሚናዎችን አስቀምጥ", "invited": "ግብዣው ተልኳል።", "rolesTitle": "ሚናዎች", "newRole": "አዲስ ሚና", "key": "ቁልፍ", "permissions": "ፈቃዶች", "createRole": "ሚና ፍጠር" },
-    "audit": { "title": "የኦዲት መዝገብ", "verify": "የሰንሰለቱን ሙሉነት አረጋግጥ", "valid": "ሰንሰለቱ ሙሉ ነው — {count} ክስተቶች ተፈትሸዋል።", "invalid": "ሰንሰለቱ በክስተት #{seq} ተሰብሯል።", "when": "መቼ", "actor": "ፈጻሚ", "action": "እርምጃ", "resource": "ሀብት", "outcome": "ውጤት", "more": "የቆዩትን ጫን" },
-    "settings": { "title": "የባህሪ መቀያየሪያዎች", "lead": "ቦታ ማስያዝ፣ ክፍያ፣ ሕዝባዊ ድምጽና ንቁ ውድድሮች ፈቃድ እስኪገኝ ድረስ ተዘግተው ይቆያሉ።", "justification": "ማብራሪያ (የተጠበቁ ባህሪያትን ለማንቃት አስፈላጊ)", "save": "አስቀምጥ" },
-    "assistant": { "title": "የቢሮ ረዳት", "lead": "በፈቃድዎ ውስጥ ረቂቆችና ማጠቃለያዎች። ማተም ወይም መዛግብትን መቀየር አይችልም።", "ask": "ጠይቅ", "placeholder": "የትግርኛ ትርጉም የጎደላቸው መዳረሻዎች የትኞቹ ናቸው?" }
+    "media": {
+      "title": "የሚዲያ ግምገማ",
+      "license": "ፈቃድ",
+      "credit": "ምንጭ",
+      "alt": "ተለዋጭ ጽሑፍ (እንግሊዝኛ)",
+      "illustrative": "ስዕላዊ መግለጫ",
+      "reconstruction": "ዳግም ግንባታ",
+      "aiGenerated": "በኤአይ የተፈጠረ",
+      "custodial": "የጠባቂዎች ፈቃድ ማጣቀሻ",
+      "saveRights": "መብቶችን አስቀምጥ",
+      "approve": "አጽድቅ",
+      "reject": "ውድቅ አድርግ",
+      "gps": "የGPS መረጃ ተወግዷል",
+      "scan": "ቅኝት፡ {status}",
+      "none": "የሚገመገም ሚዲያ የለም።"
+    },
+    "moderation": {
+      "title": "የቁጥጥር ወረፋ",
+      "none": "ወረፋው ባዶ ነው።",
+      "approve": "አጽድቅ",
+      "reject": "ውድቅ አድርግ",
+      "remove": "አስወግድ",
+      "restore": "መልስ",
+      "note": "የውሳኔ ማስታወሻ",
+      "flags": "ራስ-ሰር ምልክቶች (ለምክር ብቻ)",
+      "reports": "ሪፖርቶች"
+    },
+    "knowledge": {
+      "title": "የዕውቀት ማከማቻ",
+      "lead": "ለኤአይ መሪው በምንጭ የሚተዳደሩ ሰነዶች። እያንዳንዱ ደረጃ በሰው ይገመገማል።",
+      "upload": "ሰነድ ስቀል",
+      "file": "ፋይል (PDF፣ TXT፣ Markdown)",
+      "docTitle": "ርዕስ",
+      "author": "ደራሲ",
+      "publisher": "አሳታሚ ወይም ተቋም",
+      "published": "የታተመበት ቀን",
+      "language": "የመጀመሪያ ቋንቋ",
+      "rights": "የመብት / የፈቃድ ሁኔታ",
+      "classification": "የተደራሽነት ደረጃ",
+      "uploadBtn": "ስቀል",
+      "review": "እንደተገመገመ ምልክት አድርግ",
+      "approve": "አጽድቅ",
+      "publish": "ለፍለጋ አትም",
+      "reject": "ውድቅ አድርግ",
+      "none": "እስካሁን ሰነድ የለም።",
+      "status": "ሁኔታ"
+    },
+    "ai": {
+      "title": "የኤአይ ፖሊሲ",
+      "mode": "ንቁ ሁነታ",
+      "permitted": "የተፈቀዱ ሁነታዎች",
+      "save": "ፖሊሲውን አስቀምጥ",
+      "models": "የሞዴል መዝገብ",
+      "noModels": "የተመዘገበ ሞዴል የለም።",
+      "modes": {
+        "fully_local": "ሙሉ በሙሉ አካባቢያዊ",
+        "local_first_cloud_fallback": "መጀመሪያ አካባቢያዊ፣ ከዚያ ደመና",
+        "cloud_assisted": "በደመና የታገዘ",
+        "retrieval_only": "ፍለጋ ብቻ",
+        "deterministic": "ቋሚ ሕግ ላይ የተመሠረተ",
+        "offline": "ከመስመር ውጭ"
+      }
+    },
+    "analytics": {
+      "title": "ትንታኔ",
+      "lead": "የድረ ገጽ ተሳትፎ እንጂ የተለካ የጎብኚዎች ብዛት አይደለም።",
+      "from": "ከ",
+      "to": "እስከ",
+      "load": "ጫን",
+      "export": "{format} አውጣ"
+    },
+    "users": {
+      "title": "ተጠቃሚዎችና ሚናዎች",
+      "email": "ኢሜይል",
+      "name": "ስም",
+      "roles": "ሚናዎች",
+      "mfa": "ሁለት ደረጃ",
+      "invite": "ሠራተኛ ጋብዝ",
+      "inviteBtn": "ግብዣ ላክ",
+      "saveRoles": "ሚናዎችን አስቀምጥ",
+      "invited": "ግብዣው ተልኳል።",
+      "rolesTitle": "ሚናዎች",
+      "newRole": "አዲስ ሚና",
+      "key": "ቁልፍ",
+      "permissions": "ፈቃዶች",
+      "createRole": "ሚና ፍጠር"
+    },
+    "audit": {
+      "title": "የኦዲት መዝገብ",
+      "verify": "የሰንሰለቱን ሙሉነት አረጋግጥ",
+      "valid": "ሰንሰለቱ ሙሉ ነው — {count} ክስተቶች ተፈትሸዋል።",
+      "invalid": "ሰንሰለቱ በክስተት #{seq} ተሰብሯል።",
+      "when": "መቼ",
+      "actor": "ፈጻሚ",
+      "action": "እርምጃ",
+      "resource": "ሀብት",
+      "outcome": "ውጤት",
+      "more": "የቆዩትን ጫን"
+    },
+    "settings": {
+      "title": "የባህሪ መቀያየሪያዎች",
+      "lead": "ቦታ ማስያዝ፣ ክፍያ፣ ሕዝባዊ ድምጽና ንቁ ውድድሮች ፈቃድ እስኪገኝ ድረስ ተዘግተው ይቆያሉ።",
+      "justification": "ማብራሪያ (የተጠበቁ ባህሪያትን ለማንቃት አስፈላጊ)",
+      "save": "አስቀምጥ"
+    },
+    "assistant": {
+      "title": "የቢሮ ረዳት",
+      "lead": "በፈቃድዎ ውስጥ ረቂቆችና ማጠቃለያዎች። ማተም ወይም መዛግብትን መቀየር አይችልም።",
+      "ask": "ጠይቅ",
+      "placeholder": "የትግርኛ ትርጉም የጎደላቸው መዳረሻዎች የትኞቹ ናቸው?"
+    }
   }
 }

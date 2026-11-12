@@ -150,7 +150,8 @@ export interface TieAnswer {
   warnings: string[];
   follow_up_questions: string[];
   mode_used: string;
-  provider: { name: string; local: boolean; model?: string | null };
+  /** null when no language model produced the answer (retrieval-only / fallback). */
+  provider: { name: string; local: boolean; model?: string | null } | null;
   latency_ms: number;
 }
 

@@ -1,6 +1,12 @@
 {
-  "_meta": { "status": "machine-draft, requires native-speaker review" },
-  "brand": { "name": "ትግራይ ብጽሑ", "tagline": "ርኸቡ። ተመኮሩ። ዘክሩ።", "home": "ናብ መእተዊ ገጽ" },
+  "_meta": {
+    "status": "machine-draft, requires native-speaker review"
+  },
+  "brand": {
+    "name": "ትግራይ ብጽሑ",
+    "tagline": "ርኸቡ። ተመኮሩ። ዘክሩ።",
+    "home": "ናብ መእተዊ ገጽ"
+  },
   "common": {
     "skip": "ናብ ቀንዲ ትሕዝቶ ኺድ",
     "loading": "ይጽዓን ኣሎ…",
@@ -41,7 +47,8 @@
     "previous": "ዝሓለፈ",
     "next": "ዝቕጽል",
     "empty": "ገና ዝኾነ የለን።",
-    "signInRequired": "ንምቕጻል በጃኹም እተዉ።"
+    "signInRequired": "ንምቕጻል በጃኹም እተዉ።",
+    "pageNotFound": "እዚ ገጽ ኣይተረኽበን።"
   },
   "nav": {
     "destinations": "መዳረሻታት",
@@ -261,7 +268,14 @@
     "reportReason": "ምኽንያት",
     "reportDetail": "ዝርዝር (ኣማራጺ)",
     "reportSent": "የቐንየልና። ኣለይቲ እዚ ጸብጻብ ክግምግምዎ እዮም።",
-    "reasons": { "spam": "ዘይድለ መልእኽቲ", "harassment": "ምጽላእ", "copyright": "መሰል ደራሲ", "privacy": "ብሕትውና", "misinformation": "ጌጋ ሓበሬታ", "other": "ካልእ" },
+    "reasons": {
+      "spam": "ዘይድለ መልእኽቲ",
+      "harassment": "ምጽላእ",
+      "copyright": "መሰል ደራሲ",
+      "privacy": "ብሕትውና",
+      "misinformation": "ጌጋ ሓበሬታ",
+      "other": "ካልእ"
+    },
     "saveStory": "ዛንታ ዓቅብ",
     "storySaved": "ተዓቂቡ",
     "loadMore": "ተወሳኺ ኣምጽእ",
@@ -452,7 +466,14 @@
       "unpublished": "ዘይተሓተሙ ለውጥታት",
       "create": "ንድፊ ፍጠር",
       "edit": "ኣርም",
-      "tabs": { "content": "ትሕዝቶ", "details": "ዝርዝራት", "geo": "ቦታ", "sources": "ምንጭታት", "media": "ሚድያ", "revisions": "ክለሳታት" },
+      "tabs": {
+        "content": "ትሕዝቶ",
+        "details": "ዝርዝራት",
+        "geo": "ቦታ",
+        "sources": "ምንጭታት",
+        "media": "ሚድያ",
+        "revisions": "ክለሳታት"
+      },
       "locale": "ቋንቋ",
       "machine": "ብማሽን ዝተፈጠረ ንድፊ",
       "saveTranslation": "ትርጉም ዓቅብ",
@@ -478,7 +499,11 @@
       "lat": "ላቲቱድ",
       "lng": "ሎንጊቱድ",
       "sensitivity": "ህዝባዊ ልክዕነት",
-      "sens": { "public": "ልክዕ (ህዝባዊ)", "coarse": "ግምታዊ (~11 ኪ.ሜ)", "hidden": "ሕቡእ" },
+      "sens": {
+        "public": "ልክዕ (ህዝባዊ)",
+        "coarse": "ግምታዊ (~11 ኪ.ሜ)",
+        "hidden": "ሕቡእ"
+      },
       "saveGeo": "ቦታ ዓቅብ",
       "addSource": "ምንጪ ወስኽ",
       "sourceTitle": "ኣርእስቲ",
@@ -500,8 +525,17 @@
       "saved": "ተዓቂቡ።",
       "none": "ገና መዳረሻ የለን።"
     },
-    "translations": { "title": "መስርዕ ትርጉም", "missing": "ዝጎደሉ", "unreviewed": "ዘይተገምገሙ", "none": "ኩሎም ትርጉማት ምሉኣትን ዝተገምገሙን እዮም።" },
-    "freshness": { "title": "ሓድሽነት ትሕዝቶ", "lead": "ዘይፍለጥ፣ ዘይተረጋገጸ ወይ ግዜኡ ዝሓለፎ ሓበሬታ ዘለዎም መዛግብ።", "none": "ኩሎም መዛግብ ሓደሽቲ እዮም።" },
+    "translations": {
+      "title": "መስርዕ ትርጉም",
+      "missing": "ዝጎደሉ",
+      "unreviewed": "ዘይተገምገሙ",
+      "none": "ኩሎም ትርጉማት ምሉኣትን ዝተገምገሙን እዮም።"
+    },
+    "freshness": {
+      "title": "ሓድሽነት ትሕዝቶ",
+      "lead": "ዘይፍለጥ፣ ዘይተረጋገጸ ወይ ግዜኡ ዝሓለፎ ሓበሬታ ዘለዎም መዛግብ።",
+      "none": "ኩሎም መዛግብ ሓደሽቲ እዮም።"
+    },
     "advisories": {
       "title": "ናይ ጉዕዞ ምኽርታት",
       "new": "ሓድሽ ምኽሪ",
@@ -530,14 +564,116 @@
       "create": "ፍጻሜ ፍጠር",
       "created": "ፍጻሜ ተፈጢሩ።"
     },
-    "media": { "title": "ገምጋም ሚድያ", "license": "ፍቓድ", "credit": "ምንጪ", "alt": "ኣማራጺ ጽሑፍ (እንግሊዝኛ)", "illustrative": "ስእላዊ መግለጺ", "reconstruction": "ዳግማይ ህንጸት", "aiGenerated": "ብኤ.ኣይ. ዝተፈጠረ", "custodial": "መወከሲ ፍቓድ ሓለውቲ", "saveRights": "መሰላት ዓቅብ", "approve": "ኣጽድቕ", "reject": "ንጸግ", "gps": "ሓበሬታ GPS ተኣልዩ", "scan": "ፍተሻ: {status}", "none": "ዝግምገም ሚድያ የለን።" },
-    "moderation": { "title": "መስርዕ ምቁጽጻር", "none": "መስርዕ ባዶ እዩ።", "approve": "ኣጽድቕ", "reject": "ንጸግ", "remove": "ኣልግስ", "restore": "መልስ", "note": "መዘኻኸሪ ውሳነ", "flags": "ኣውቶማቲክ ምልክታት (ንምኽሪ ጥራይ)", "reports": "ጸብጻባት" },
-    "knowledge": { "title": "መዝገብ ፍልጠት", "lead": "ንኤ.ኣይ. መራሒ ብምንጪ ዝምርሑ ሰነዳት። ነፍሲ ወከፍ ደረጃ ብሰብ ይግምገም።", "upload": "ሰነድ ስቐል", "file": "ፋይል (PDF, TXT, Markdown)", "docTitle": "ኣርእስቲ", "author": "ደራሲ", "publisher": "ኣሕታሚ ወይ ትካል", "published": "ዕለት ሕታም", "language": "መበቆላዊ ቋንቋ", "rights": "መሰል / ኩነታት ፍቓድ", "classification": "ደረጃ ምብጻሕ", "uploadBtn": "ስቐል", "review": "ከም ዝተገምገመ ምልክት ግበር", "approve": "ኣጽድቕ", "publish": "ንምርካብ ሕተም", "reject": "ንጸግ", "none": "ገና ሰነድ የለን።", "status": "ኩነታት" },
-    "ai": { "title": "ፖሊሲ ኤ.ኣይ.", "mode": "ንጡፍ ኣገባብ", "permitted": "ዝተፈቕዱ ኣገባባት", "save": "ፖሊሲ ዓቅብ", "models": "መዝገብ ሞዴላት", "noModels": "ዝተመዝገበ ሞዴል የለን።", "modes": { "fully_local": "ምሉእ ብምሉእ ውሽጣዊ", "local_first_cloud_fallback": "ቅድሚ ውሽጣዊ፣ ደሓር ደመና", "cloud_assisted": "ብደመና ዝተሓገዘ", "retrieval_only": "ምርካብ ጥራይ", "deterministic": "ዝተወሰነ", "offline": "ብዘይ መርበብ" } },
-    "analytics": { "title": "ትንተና", "lead": "ተሳትፎ ወብሳይት፣ ዝተለክዐ ምምጻእ በጻሕቲ ኣይኮነን።", "from": "ካብ", "to": "ክሳብ", "load": "ኣምጽእ", "export": "{format} ኣውጽእ" },
-    "users": { "title": "ተጠቀምትን ተራታትን", "email": "ኢመይል", "name": "ሽም", "roles": "ተራታት", "mfa": "ክልተ-ደረጃ", "invite": "ሰራሕተኛ ዕደም", "inviteBtn": "ዕድመ ስደድ", "saveRoles": "ተራታት ዓቅብ", "invited": "ዕድመ ተላኢኹ።", "rolesTitle": "ተራታት", "newRole": "ሓድሽ ተራ", "key": "መፍትሕ", "permissions": "ፍቓዳት", "createRole": "ተራ ፍጠር" },
-    "audit": { "title": "መዝገብ ኦዲት", "verify": "ምሉእነት ሰንሰለት ኣረጋግጽ", "valid": "ሰንሰለት ምሉእ እዩ — {count} ፍጻሜታት ተፈቲሾም።", "invalid": "ሰንሰለት ኣብ ፍጻሜ #{seq} ተሰይሩ።", "when": "መዓስ", "actor": "ፈጻሚ", "action": "ስጉምቲ", "resource": "ዕላማ", "outcome": "ውጽኢት", "more": "ዝቐደሙ ኣምጽእ" },
-    "settings": { "title": "መቆጻጸሪ ባህርያት", "lead": "ምሕጻር፣ ክፍሊት፣ ህዝባዊ ድምጺን ንጡፋት ውድድራትን ፍቓድ ክሳብ ዝርከብ ዕጹዋት ይጸንሑ።", "justification": "መረጋገጺ (ዝተሓለዉ ባህርያት ንምንቃሕ ኣገዳሲ)", "save": "ዓቅብ" },
-    "assistant": { "title": "ሓጋዚ ቢሮ", "lead": "ኣብ ውሽጢ ፍቓድኩም ንድፍታትን ጽማቓትን። ክሓትም ወይ መዛግብ ክቕይር ኣይክእልን።", "ask": "ሕተት", "placeholder": "ትግርኛ ትርጉም ዝጎደሎም መዳረሻታት ኣየኖት እዮም?" }
+    "media": {
+      "title": "ገምጋም ሚድያ",
+      "license": "ፍቓድ",
+      "credit": "ምንጪ",
+      "alt": "ኣማራጺ ጽሑፍ (እንግሊዝኛ)",
+      "illustrative": "ስእላዊ መግለጺ",
+      "reconstruction": "ዳግማይ ህንጸት",
+      "aiGenerated": "ብኤ.ኣይ. ዝተፈጠረ",
+      "custodial": "መወከሲ ፍቓድ ሓለውቲ",
+      "saveRights": "መሰላት ዓቅብ",
+      "approve": "ኣጽድቕ",
+      "reject": "ንጸግ",
+      "gps": "ሓበሬታ GPS ተኣልዩ",
+      "scan": "ፍተሻ: {status}",
+      "none": "ዝግምገም ሚድያ የለን።"
+    },
+    "moderation": {
+      "title": "መስርዕ ምቁጽጻር",
+      "none": "መስርዕ ባዶ እዩ።",
+      "approve": "ኣጽድቕ",
+      "reject": "ንጸግ",
+      "remove": "ኣልግስ",
+      "restore": "መልስ",
+      "note": "መዘኻኸሪ ውሳነ",
+      "flags": "ኣውቶማቲክ ምልክታት (ንምኽሪ ጥራይ)",
+      "reports": "ጸብጻባት"
+    },
+    "knowledge": {
+      "title": "መዝገብ ፍልጠት",
+      "lead": "ንኤ.ኣይ. መራሒ ብምንጪ ዝምርሑ ሰነዳት። ነፍሲ ወከፍ ደረጃ ብሰብ ይግምገም።",
+      "upload": "ሰነድ ስቐል",
+      "file": "ፋይል (PDF, TXT, Markdown)",
+      "docTitle": "ኣርእስቲ",
+      "author": "ደራሲ",
+      "publisher": "ኣሕታሚ ወይ ትካል",
+      "published": "ዕለት ሕታም",
+      "language": "መበቆላዊ ቋንቋ",
+      "rights": "መሰል / ኩነታት ፍቓድ",
+      "classification": "ደረጃ ምብጻሕ",
+      "uploadBtn": "ስቐል",
+      "review": "ከም ዝተገምገመ ምልክት ግበር",
+      "approve": "ኣጽድቕ",
+      "publish": "ንምርካብ ሕተም",
+      "reject": "ንጸግ",
+      "none": "ገና ሰነድ የለን።",
+      "status": "ኩነታት"
+    },
+    "ai": {
+      "title": "ፖሊሲ ኤ.ኣይ.",
+      "mode": "ንጡፍ ኣገባብ",
+      "permitted": "ዝተፈቕዱ ኣገባባት",
+      "save": "ፖሊሲ ዓቅብ",
+      "models": "መዝገብ ሞዴላት",
+      "noModels": "ዝተመዝገበ ሞዴል የለን።",
+      "modes": {
+        "fully_local": "ምሉእ ብምሉእ ውሽጣዊ",
+        "local_first_cloud_fallback": "ቅድሚ ውሽጣዊ፣ ደሓር ደመና",
+        "cloud_assisted": "ብደመና ዝተሓገዘ",
+        "retrieval_only": "ምርካብ ጥራይ",
+        "deterministic": "ዝተወሰነ",
+        "offline": "ብዘይ መርበብ"
+      }
+    },
+    "analytics": {
+      "title": "ትንተና",
+      "lead": "ተሳትፎ ወብሳይት፣ ዝተለክዐ ምምጻእ በጻሕቲ ኣይኮነን።",
+      "from": "ካብ",
+      "to": "ክሳብ",
+      "load": "ኣምጽእ",
+      "export": "{format} ኣውጽእ"
+    },
+    "users": {
+      "title": "ተጠቀምትን ተራታትን",
+      "email": "ኢመይል",
+      "name": "ሽም",
+      "roles": "ተራታት",
+      "mfa": "ክልተ-ደረጃ",
+      "invite": "ሰራሕተኛ ዕደም",
+      "inviteBtn": "ዕድመ ስደድ",
+      "saveRoles": "ተራታት ዓቅብ",
+      "invited": "ዕድመ ተላኢኹ።",
+      "rolesTitle": "ተራታት",
+      "newRole": "ሓድሽ ተራ",
+      "key": "መፍትሕ",
+      "permissions": "ፍቓዳት",
+      "createRole": "ተራ ፍጠር"
+    },
+    "audit": {
+      "title": "መዝገብ ኦዲት",
+      "verify": "ምሉእነት ሰንሰለት ኣረጋግጽ",
+      "valid": "ሰንሰለት ምሉእ እዩ — {count} ፍጻሜታት ተፈቲሾም።",
+      "invalid": "ሰንሰለት ኣብ ፍጻሜ #{seq} ተሰይሩ።",
+      "when": "መዓስ",
+      "actor": "ፈጻሚ",
+      "action": "ስጉምቲ",
+      "resource": "ዕላማ",
+      "outcome": "ውጽኢት",
+      "more": "ዝቐደሙ ኣምጽእ"
+    },
+    "settings": {
+      "title": "መቆጻጸሪ ባህርያት",
+      "lead": "ምሕጻር፣ ክፍሊት፣ ህዝባዊ ድምጺን ንጡፋት ውድድራትን ፍቓድ ክሳብ ዝርከብ ዕጹዋት ይጸንሑ።",
+      "justification": "መረጋገጺ (ዝተሓለዉ ባህርያት ንምንቃሕ ኣገዳሲ)",
+      "save": "ዓቅብ"
+    },
+    "assistant": {
+      "title": "ሓጋዚ ቢሮ",
+      "lead": "ኣብ ውሽጢ ፍቓድኩም ንድፍታትን ጽማቓትን። ክሓትም ወይ መዛግብ ክቕይር ኣይክእልን።",
+      "ask": "ሕተት",
+      "placeholder": "ትግርኛ ትርጉም ዝጎደሎም መዳረሻታት ኣየኖት እዮም?"
+    }
   }
 }

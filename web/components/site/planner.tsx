@@ -26,7 +26,7 @@ export function Planner({ include, itineraryId }: { include?: string; itineraryI
   const { me } = useSession();
   const [destinations, setDestinations] = useState<Pick<Destination, "slug" | "name">[]>([]);
   const [days, setDays] = useState(3);
-  const [start, setStart] = useState("");
+  const [start, setStart] = useState(include ?? "");
   const [interests, setInterests] = useState<string[]>(["history", "heritage"]);
   const [pace, setPace] = useState("balanced");
   const [stepFree, setStepFree] = useState(false);
@@ -70,7 +70,6 @@ export function Planner({ include, itineraryId }: { include?: string; itineraryI
     group_size: group,
     locale,
     avoid_slugs: [] as string[],
-    include_slugs: include ? [include] : [],
   };
 
   async function create(e: React.FormEvent) {

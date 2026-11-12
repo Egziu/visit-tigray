@@ -1,6 +1,12 @@
 {
-  "_meta": { "status": "source" },
-  "brand": { "name": "Visit Tigray", "tagline": "Discover. Experience. Remember.", "home": "Visit Tigray home" },
+  "_meta": {
+    "status": "source"
+  },
+  "brand": {
+    "name": "Visit Tigray",
+    "tagline": "Discover. Experience. Remember.",
+    "home": "Visit Tigray home"
+  },
   "common": {
     "skip": "Skip to main content",
     "loading": "Loading…",
@@ -41,7 +47,8 @@
     "previous": "Previous",
     "next": "Next",
     "empty": "Nothing here yet.",
-    "signInRequired": "Please sign in to continue."
+    "signInRequired": "Please sign in to continue.",
+    "pageNotFound": "This page could not be found."
   },
   "nav": {
     "destinations": "Destinations",
@@ -261,7 +268,14 @@
     "reportReason": "Reason",
     "reportDetail": "Details (optional)",
     "reportSent": "Thank you. Moderators will review this report.",
-    "reasons": { "spam": "Spam", "harassment": "Harassment", "copyright": "Copyright", "privacy": "Privacy", "misinformation": "Misinformation", "other": "Other" },
+    "reasons": {
+      "spam": "Spam",
+      "harassment": "Harassment",
+      "copyright": "Copyright",
+      "privacy": "Privacy",
+      "misinformation": "Misinformation",
+      "other": "Other"
+    },
     "saveStory": "Save story",
     "storySaved": "Saved",
     "loadMore": "Load more",
@@ -452,7 +466,14 @@
       "unpublished": "Unpublished changes",
       "create": "Create draft",
       "edit": "Edit",
-      "tabs": { "content": "Content", "details": "Details", "geo": "Location", "sources": "Sources", "media": "Media", "revisions": "Revisions" },
+      "tabs": {
+        "content": "Content",
+        "details": "Details",
+        "geo": "Location",
+        "sources": "Sources",
+        "media": "Media",
+        "revisions": "Revisions"
+      },
       "locale": "Language",
       "machine": "Machine-generated draft",
       "saveTranslation": "Save translation",
@@ -478,7 +499,11 @@
       "lat": "Latitude",
       "lng": "Longitude",
       "sensitivity": "Public precision",
-      "sens": { "public": "Exact (public)", "coarse": "Approximate (~11 km)", "hidden": "Hidden" },
+      "sens": {
+        "public": "Exact (public)",
+        "coarse": "Approximate (~11 km)",
+        "hidden": "Hidden"
+      },
       "saveGeo": "Save location",
       "addSource": "Add source",
       "sourceTitle": "Title",
@@ -500,8 +525,17 @@
       "saved": "Saved.",
       "none": "No destinations yet."
     },
-    "translations": { "title": "Translation queue", "missing": "Missing", "unreviewed": "Unreviewed", "none": "All translations are complete and reviewed." },
-    "freshness": { "title": "Content freshness", "lead": "Records with unknown, unverified or overdue information.", "none": "All records are current." },
+    "translations": {
+      "title": "Translation queue",
+      "missing": "Missing",
+      "unreviewed": "Unreviewed",
+      "none": "All translations are complete and reviewed."
+    },
+    "freshness": {
+      "title": "Content freshness",
+      "lead": "Records with unknown, unverified or overdue information.",
+      "none": "All records are current."
+    },
     "advisories": {
       "title": "Travel advisories",
       "new": "New advisory",
@@ -530,14 +564,116 @@
       "create": "Create event",
       "created": "Event created."
     },
-    "media": { "title": "Media review", "license": "Licence", "credit": "Credit", "alt": "Alt text (English)", "illustrative": "Illustration", "reconstruction": "Reconstruction", "aiGenerated": "AI-generated", "custodial": "Custodial approval reference", "saveRights": "Save rights", "approve": "Approve", "reject": "Reject", "gps": "GPS metadata was stripped", "scan": "Scan: {status}", "none": "No media to review." },
-    "moderation": { "title": "Moderation queue", "none": "The queue is empty.", "approve": "Approve", "reject": "Reject", "remove": "Remove", "restore": "Restore", "note": "Decision note", "flags": "Automated flags (advisory only)", "reports": "Reports" },
-    "knowledge": { "title": "Knowledge Vault", "lead": "Source-governed documents for the AI guide. Each step is reviewed by a person.", "upload": "Upload document", "file": "File (PDF, TXT, Markdown)", "docTitle": "Title", "author": "Author", "publisher": "Publisher or institution", "published": "Publication date", "language": "Original language", "rights": "Rights / licence status", "classification": "Access classification", "uploadBtn": "Upload", "review": "Mark reviewed", "approve": "Approve", "publish": "Publish for retrieval", "reject": "Reject", "none": "No documents yet.", "status": "Status" },
-    "ai": { "title": "AI policy", "mode": "Active mode", "permitted": "Permitted modes", "save": "Save policy", "models": "Model registry", "noModels": "No models registered.", "modes": { "fully_local": "Fully local", "local_first_cloud_fallback": "Local first, cloud fallback", "cloud_assisted": "Cloud assisted", "retrieval_only": "Retrieval only", "deterministic": "Deterministic", "offline": "Offline" } },
-    "analytics": { "title": "Analytics", "lead": "Website engagement, not measured tourism arrivals.", "from": "From", "to": "To", "load": "Load", "export": "Export {format}" },
-    "users": { "title": "Users and roles", "email": "Email", "name": "Name", "roles": "Roles", "mfa": "2-step", "invite": "Invite staff member", "inviteBtn": "Send invitation", "saveRoles": "Save roles", "invited": "Invitation sent.", "rolesTitle": "Roles", "newRole": "New role", "key": "Key", "permissions": "Permissions", "createRole": "Create role" },
-    "audit": { "title": "Audit log", "verify": "Verify chain integrity", "valid": "Chain intact — {count} events checked.", "invalid": "Chain broken at event #{seq}.", "when": "When", "actor": "Actor", "action": "Action", "resource": "Resource", "outcome": "Outcome", "more": "Load older" },
-    "settings": { "title": "Feature flags", "lead": "Bookings, payments, public voting and live competitions stay off until approvals exist.", "justification": "Justification (required to enable guarded features)", "save": "Save flags" },
-    "assistant": { "title": "Bureau assistant", "lead": "Drafts and summaries within your permissions. It cannot publish or change records.", "ask": "Ask", "placeholder": "Which destinations are missing Tigrinya translations?" }
+    "media": {
+      "title": "Media review",
+      "license": "Licence",
+      "credit": "Credit",
+      "alt": "Alt text (English)",
+      "illustrative": "Illustration",
+      "reconstruction": "Reconstruction",
+      "aiGenerated": "AI-generated",
+      "custodial": "Custodial approval reference",
+      "saveRights": "Save rights",
+      "approve": "Approve",
+      "reject": "Reject",
+      "gps": "GPS metadata was stripped",
+      "scan": "Scan: {status}",
+      "none": "No media to review."
+    },
+    "moderation": {
+      "title": "Moderation queue",
+      "none": "The queue is empty.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "remove": "Remove",
+      "restore": "Restore",
+      "note": "Decision note",
+      "flags": "Automated flags (advisory only)",
+      "reports": "Reports"
+    },
+    "knowledge": {
+      "title": "Knowledge Vault",
+      "lead": "Source-governed documents for the AI guide. Each step is reviewed by a person.",
+      "upload": "Upload document",
+      "file": "File (PDF, TXT, Markdown)",
+      "docTitle": "Title",
+      "author": "Author",
+      "publisher": "Publisher or institution",
+      "published": "Publication date",
+      "language": "Original language",
+      "rights": "Rights / licence status",
+      "classification": "Access classification",
+      "uploadBtn": "Upload",
+      "review": "Mark reviewed",
+      "approve": "Approve",
+      "publish": "Publish for retrieval",
+      "reject": "Reject",
+      "none": "No documents yet.",
+      "status": "Status"
+    },
+    "ai": {
+      "title": "AI policy",
+      "mode": "Active mode",
+      "permitted": "Permitted modes",
+      "save": "Save policy",
+      "models": "Model registry",
+      "noModels": "No models registered.",
+      "modes": {
+        "fully_local": "Fully local",
+        "local_first_cloud_fallback": "Local first, cloud fallback",
+        "cloud_assisted": "Cloud assisted",
+        "retrieval_only": "Retrieval only",
+        "deterministic": "Deterministic",
+        "offline": "Offline"
+      }
+    },
+    "analytics": {
+      "title": "Analytics",
+      "lead": "Website engagement, not measured tourism arrivals.",
+      "from": "From",
+      "to": "To",
+      "load": "Load",
+      "export": "Export {format}"
+    },
+    "users": {
+      "title": "Users and roles",
+      "email": "Email",
+      "name": "Name",
+      "roles": "Roles",
+      "mfa": "2-step",
+      "invite": "Invite staff member",
+      "inviteBtn": "Send invitation",
+      "saveRoles": "Save roles",
+      "invited": "Invitation sent.",
+      "rolesTitle": "Roles",
+      "newRole": "New role",
+      "key": "Key",
+      "permissions": "Permissions",
+      "createRole": "Create role"
+    },
+    "audit": {
+      "title": "Audit log",
+      "verify": "Verify chain integrity",
+      "valid": "Chain intact — {count} events checked.",
+      "invalid": "Chain broken at event #{seq}.",
+      "when": "When",
+      "actor": "Actor",
+      "action": "Action",
+      "resource": "Resource",
+      "outcome": "Outcome",
+      "more": "Load older"
+    },
+    "settings": {
+      "title": "Feature flags",
+      "lead": "Bookings, payments, public voting and live competitions stay off until approvals exist.",
+      "justification": "Justification (required to enable guarded features)",
+      "save": "Save flags"
+    },
+    "assistant": {
+      "title": "Bureau assistant",
+      "lead": "Drafts and summaries within your permissions. It cannot publish or change records.",
+      "ask": "Ask",
+      "placeholder": "Which destinations are missing Tigrinya translations?"
+    }
   }
 }

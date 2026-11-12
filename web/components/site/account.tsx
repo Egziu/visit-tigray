@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Alert, Button, Card, Checkbox, Input, Loading, Select, Textarea } from "@/components/ui";
 import { api, ApiError, errorMessage } from "@/lib/api";
 import type { Me } from "@/lib/types";
+import { useLoad } from "@/components/bureau/hooks";
 import { useI18n, useSession } from "./providers";
 
 type Msg = { tone: "success" | "danger" | "info"; text: string } | null;
@@ -211,12 +212,26 @@ function SignIn({ onSignedIn }: { onSignedIn: () => void }) {
   );
 }
 
-function Profile({ me }: { me: Me }) {
+interface ProfileData {
+  handle?: string | null;
+  bio?: string | null;
+  visibility?: string;
+  display_name?: string;
+}
+
+function ProfileLoader({ me }: { me: Me }) {
   const { t } = useI18n();
-  const [name, setName] = useState(me.display_name);
-  const [handle, setHandle] = useState("");
-  const [bio, setBio] = useState("");
-  const [visibility, setVisibility] = useState("private");
+  const { data, error, loading } = useLoad<ProfileData>("/me/profile");
+  if (loading) return <Loading label={t("common.loading")} />;
+  return <Profile key={data ? "loaded" : "empty"} me={me} initial={error ? null : data} />;
+}
+
+function Profile({ me, initial }: { me: Me; initial: ProfileData | null }) {
+  const { t } = useI18n();
+  const [name, setName] = useState(initial?.display_name ?? me.display_name);
+  const [handle, setHandle] = useState(initial?.handle ?? "");
+  const [bio, setBio] = useState(initial?.bio ?? "");
+  const [visibility, setVisibility] = useState(initial?.visibility ?? "private");
   const [msg, setMsg] = useState<Msg>(null);
   return (
     <form
@@ -233,8 +248,8 @@ function Profile({ me }: { me: Me }) {
     >
       <h2 className="text-2xl">{t("account.profile")}</h2>
       <Input id="p-name" label={t("account.displayName")} value={name} onChange={(e) => setName(e.target.value)} required maxLength={80} />
-      <Input id="p-handle" label={t("account.handle")} value={handle} onChange={(e) => setHandle(e.target.value)} pattern="[a-z0-9_]{3,30}" maxLength={30} />
-      <Textarea id="p-bio" label={t("account.bio")} value={bio} onChange={(e) => setBio(e.target.value)} maxLength={500} />
+      <Input id="p-handle" label={t("account.handle")} value={handle} onChange={(e) => setHandle(e.target.value)} pattern="[a-z0-9_]{3,40}" maxLength={40} />
+      <Textarea id="p-bio" label={t("account.bio")} value={bio} onChange={(e) => setBio(e.target.value)} maxLength={600} />
       <Select id="p-vis" label={t("account.visibility")} value={visibility} onChange={(e) => setVisibility(e.target.value)} options={[{ value: "private", label: t("account.private") }, { value: "public", label: t("account.public") }]} />
       <Button type="submit">{t("common.save")}</Button>
       {msg && <Alert tone={msg.tone}>{msg.text}</Alert>}
@@ -326,7 +341,7 @@ export function AccountPanel() {
         </Button>
       </Card>
       <Card>
-        <Profile me={me} />
+        <ProfileLoader me={me} />
       </Card>
       <Card className="lg:col-span-2">
         <MyData />

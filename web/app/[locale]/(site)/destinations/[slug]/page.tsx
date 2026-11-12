@@ -10,11 +10,8 @@ import { makeT } from "@/lib/i18n";
 import { serverGet } from "@/lib/server-api";
 import type { Destination, TriState } from "@/lib/types";
 
-export const revalidate = 60;
-export const dynamicParams = true;
-export function generateStaticParams() {
-  return [];
-}
+// Rendered on demand (no build-time API dependency); data fetches revalidate every 60 s.
+export const dynamic = "force-dynamic";
 
 async function load(slug: string, locale: string) {
   return serverGet<Destination>(`/api/destinations/${encodeURIComponent(slug)}?locale=${locale}`);

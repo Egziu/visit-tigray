@@ -101,6 +101,9 @@
   --radius-card: var(--radius);
 }
 
+/* Base element styles live in the base layer so Tailwind utilities (layer: utilities) can
+   override them — unlayered rules would beat every utility class. */
+@layer base {
 html {
   background: var(--color-bg);
   -webkit-text-size-adjust: 100%;
@@ -162,6 +165,7 @@ a {
   border-radius: 8px;
 }
 .skip-link:focus { top: 1rem; }
+}
 
 /* Subtle, purposeful motion — disabled for reduced-motion users */
 @media (prefers-reduced-motion: no-preference) {

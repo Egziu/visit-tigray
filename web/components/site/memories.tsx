@@ -216,7 +216,7 @@ export function MemoryDetail({ id }: { id: string }) {
               void act(() => api(`/memories/${id}/comments`, { json: { body: comment } }), t("memories.commentPending")).then(() => setComment(""));
             }}
           >
-            <Textarea id="comment" label={t("memories.addComment")} value={comment} onChange={(e) => setComment(e.target.value)} maxLength={2000} required />
+            <Textarea id="comment" label={t("memories.addComment")} value={comment} onChange={(e) => setComment(e.target.value)} minLength={2} maxLength={1500} required />
             <Button type="submit" size="sm" disabled={!comment.trim()}>
               {t("memories.postComment")}
             </Button>
@@ -307,7 +307,7 @@ export function NewMemoryForm() {
   return (
     <form onSubmit={submit} className="max-w-2xl space-y-6">
       <Input id="m-title" label={t("memories.storyTitle")} value={title} onChange={(e) => setTitle(e.target.value)} required minLength={5} maxLength={140} />
-      <Textarea id="m-body" label={t("memories.storyBody")} value={body} onChange={(e) => setBody(e.target.value)} required minLength={30} maxLength={20000} rows={10} />
+      <Textarea id="m-body" label={t("memories.storyBody")} value={body} onChange={(e) => setBody(e.target.value)} required minLength={30} maxLength={8000} rows={10} />
       <Select id="m-dest" label={t("memories.destination")} value={dest} onChange={(e) => setDest(e.target.value)} options={[{ value: "", label: "—" }, ...destinations.map((d) => ({ value: d.slug, label: d.name }))]} />
       <div className="flex flex-col gap-1.5">
         <label htmlFor="m-files" className="text-sm font-medium">

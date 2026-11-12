@@ -15,7 +15,9 @@ interface Persona {
 interface Status {
   mode: string;
   permitted_modes: string[];
-  provider: { name: string; local: boolean; model?: string | null; available: boolean };
+  generative?: boolean;
+  notice?: string;
+  provider: { name: string; local: boolean; model?: string | null } | null;
 }
 type Turn = { role: "user"; text: string } | { role: "guide"; answer: TieAnswer; feedback?: "up" | "down" };
 
@@ -69,7 +71,10 @@ export function GuideChat({ destinationSlug }: { destinationSlug?: string }) {
       .catch((e) => setUnavailable(e instanceof ApiError && e.notAvailable ? t("common.notAvailableYet") : t("guide.unavailable")));
   }, [locale, t]);
 
-  useEffect(() => endRef.current?.scrollIntoView({ block: "nearest" }), [turns]);
+  useEffect(() => {
+    // Block body on purpose: modern scrollIntoView() returns a Promise, which React would treat as a cleanup.
+    endRef.current?.scrollIntoView({ block: "nearest" });
+  }, [turns]);
 
   async function ask(q: string) {
     if (!q.trim()) return;
@@ -108,7 +113,7 @@ export function GuideChat({ destinationSlug }: { destinationSlug?: string }) {
       <section aria-label={t("guide.title")} className="flex min-h-[480px] flex-col rounded-[var(--radius)] border border-line bg-surface">
         <div className="flex flex-wrap items-center gap-2 border-b border-line px-5 py-3 text-sm text-muted">
           {status && <span>{t("guide.status", { mode: status.mode })}</span>}
-          {status && (
+          {status?.provider && (
             <Badge tone={status.provider.local ? "success" : "caution"}>
               {status.provider.local ? "local" : "external"} · {status.provider.model ?? status.provider.name}
             </Badge>
@@ -144,7 +149,7 @@ export function GuideChat({ destinationSlug }: { destinationSlug?: string }) {
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   <Badge tone={CONF_TONE[turn.answer.confidence]}>{t(`guide.confidence.${turn.answer.confidence}`)}</Badge>
                   <span className="text-muted">
-                    {turn.answer.mode_used === "retrieval_only" || turn.answer.provider.name === "retrieval"
+                    {!turn.answer.provider || turn.answer.mode_used === "retrieval_only"
                       ? t("guide.retrieval")
                       : turn.answer.provider.local
                         ? t("guide.local", { model: turn.answer.provider.model ?? turn.answer.provider.name })

@@ -23,10 +23,12 @@ function ErrorState({ e }: { e: unknown }) {
 
 export function CompetitionList() {
   const { t, locale } = useI18n();
-  const { data, error } = useApi<Competition[]>(`/competitions?locale=${locale}`);
+  const { data: raw, error } = useApi<Competition[] | { items: Competition[]; notice?: string }>(`/competitions?locale=${locale}`);
   if (error) return <ErrorState e={error} />;
-  if (!data) return <Loading label={t("common.loading")} />;
-  if (data.length === 0) return <EmptyState title={t("awards.none")}>{t("awards.notOpen")}</EmptyState>;
+  if (!raw) return <Loading label={t("common.loading")} />;
+  const data = Array.isArray(raw) ? raw : raw.items;
+  const notice = Array.isArray(raw) ? undefined : raw.notice;
+  if (data.length === 0) return <EmptyState title={t("awards.none")}>{notice ?? t("awards.notOpen")}</EmptyState>;
   return (
     <ul className="grid gap-6 md:grid-cols-2">
       {data.map((c) => (

@@ -44,7 +44,7 @@ function Schematic({ pins }: { pins: Pin[] }) {
   const y = (lat: number) => ((BOX.maxLat - lat) / (BOX.maxLat - BOX.minLat)) * 460;
   return (
     <figure className="rounded-[var(--radius)] border border-line bg-surface p-4">
-      <svg viewBox="0 0 600 460" role="img" aria-label={t("map.title")} className="h-auto w-full">
+      <svg viewBox="0 0 600 460" role="group" aria-label={t("map.title")} className="h-auto w-full">
         <rect width="600" height="460" rx="12" fill="var(--color-surface-2)" />
         {[0, 1, 2, 3, 4].map((i) => (
           <line key={`h${i}`} x1="0" x2="600" y1={i * 115} y2={i * 115} stroke="var(--color-line)" />
