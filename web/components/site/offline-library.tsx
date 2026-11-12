@@ -29,14 +29,19 @@ export function OfflineLibrary() {
   const [msg, setMsg] = useState<string | null>(null);
   const [open, setOpen] = useState<SavedItem | null>(null);
 
-  const reload = useCallback(async () => {
-    setItems(await listItems().catch(() => []));
-    setOutbox(await listOutbox().catch(() => []));
-    setEstimate(await storageEstimate().catch(() => null));
+  const fetchAll = useCallback(
+    () => Promise.all([listItems().catch(() => [] as SavedItem[]), listOutbox().catch(() => [] as OutboxItem[]), storageEstimate().catch(() => null)]),
+    [],
+  );
+  const apply = useCallback(([i, o, e]: [SavedItem[], OutboxItem[], { used: number; quota: number } | null]) => {
+    setItems(i);
+    setOutbox(o);
+    setEstimate(e);
   }, []);
+  const reload = useCallback(async () => apply(await fetchAll()), [apply, fetchAll]);
   useEffect(() => {
-    void reload();
-  }, [reload]);
+    fetchAll().then(apply);
+  }, [fetchAll, apply]);
 
   if (!items) return <Loading label={t("common.loading")} />;
 

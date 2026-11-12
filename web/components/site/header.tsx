@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
+import { getSaver, getTheme, setSaver, setTheme, subscribePrefs, type Theme } from "@/lib/prefs";
 import { cn } from "@/components/ui";
 import { LOCALE_NAMES, LOCALES, type MsgKey } from "@/lib/i18n";
 import { api } from "@/lib/api";
@@ -46,25 +47,10 @@ export function LanguageSwitcher() {
   );
 }
 
-type Theme = "system" | "light" | "dark";
-
 export function ThemeToggle() {
   const { t } = useI18n();
-  const [theme, setTheme] = useState<Theme>("system");
-  useEffect(() => {
-    const saved = localStorage.getItem("vt_theme");
-    if (saved === "light" || saved === "dark") setTheme(saved);
-  }, []);
-  function apply(next: Theme) {
-    setTheme(next);
-    if (next === "system") {
-      localStorage.removeItem("vt_theme");
-      delete document.documentElement.dataset.theme;
-    } else {
-      localStorage.setItem("vt_theme", next);
-      document.documentElement.dataset.theme = next;
-    }
-  }
+  const theme = useSyncExternalStore(subscribePrefs, getTheme, () => "system" as Theme);
+  const apply = setTheme;
   const order: Theme[] = ["system", "light", "dark"];
   const label = { system: t("nav.themeSystem"), light: t("nav.themeLight"), dark: t("nav.themeDark") }[theme];
   return (
@@ -83,23 +69,12 @@ export function ThemeToggle() {
 
 export function DataSaverToggle() {
   const { t } = useI18n();
-  const [on, setOn] = useState(false);
-  useEffect(() => setOn(localStorage.getItem("vt_saver") === "on"), []);
+  const on = useSyncExternalStore(subscribePrefs, getSaver, () => false);
   return (
     <button
       type="button"
       aria-pressed={on}
-      onClick={() => {
-        const next = !on;
-        setOn(next);
-        if (next) {
-          localStorage.setItem("vt_saver", "on");
-          document.documentElement.dataset.saver = "on";
-        } else {
-          localStorage.removeItem("vt_saver");
-          delete document.documentElement.dataset.saver;
-        }
-      }}
+      onClick={() => setSaver(!on)}
       className={cn(
         "min-h-[40px] rounded-full border px-3 py-1.5 text-sm",
         on ? "border-forest bg-forest text-on-forest" : "border-line bg-surface",
@@ -115,7 +90,11 @@ export function Header() {
   const { me, refresh } = useSession();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  useEffect(() => setOpen(false), [pathname]);
+  const [lastPath, setLastPath] = useState(pathname);
+  if (lastPath !== pathname) {
+    setLastPath(pathname);
+    setOpen(false); // close the mobile menu after navigation
+  }
   const isStaff = !!me && (me.permissions.length > 0 || me.pending_permissions.length > 0);
 
   return (

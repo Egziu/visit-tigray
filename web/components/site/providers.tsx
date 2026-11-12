@@ -57,9 +57,13 @@ export function Providers({ locale, children }: { locale: string; children: Reac
   }, []);
 
   useEffect(() => {
-    void refresh();
-    api<PublicConfig>("/config/public").then(setConfig).catch(() => setConfig(null));
-  }, [refresh]);
+    api<Me>("/me")
+      .then(setMe, (e) => {
+        if (!(e instanceof ApiError) || e.status === 401 || e.status === 0) setMe(null);
+      })
+      .finally(() => setLoading(false));
+    api<PublicConfig>("/config/public").then(setConfig, () => setConfig(null));
+  }, []);
 
   const session = useMemo<SessionValue>(
     () => ({ me, loading, refresh, config, has: (p) => !!me?.permissions.includes(p) }),

@@ -6,17 +6,11 @@ import { Alert, Badge, Button, Checkbox, EmptyState, Input, Loading, Select, Tex
 import { api, ApiError, errorMessage } from "@/lib/api";
 import { formatDate } from "@/lib/format";
 import type { Competition, Provider } from "@/lib/types";
+import { useLoad } from "@/components/bureau/hooks";
 import { useI18n, useSession } from "./providers";
 
 function useApi<T>(path: string | null) {
-  const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState<unknown>(null);
-  useEffect(() => {
-    if (!path) return;
-    setData(null);
-    setError(null);
-    api<T>(path).then(setData).catch(setError);
-  }, [path]);
+  const { data, error } = useLoad<T>(path);
   return { data, error };
 }
 

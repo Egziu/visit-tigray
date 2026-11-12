@@ -46,24 +46,38 @@ export function MemoryFeed({ creator }: { creator?: string }) {
   const [items, setItems] = useState<Memory[] | null>(null);
   const [cursor, setCursor] = useState<string | null>(null);
   const [error, setError] = useState<unknown>(null);
-  const load = useCallback(
-    async (c?: string | null) => {
-      try {
-        const qs = new URLSearchParams({ locale });
-        if (c) qs.set("cursor", c);
-        if (creator) qs.set("creator", creator);
-        const r = await api<{ items: Memory[]; next_cursor: string | null }>(`/memories?${qs}`);
-        setItems((prev) => (c ? [...(prev ?? []), ...r.items] : r.items));
-        setCursor(r.next_cursor);
-      } catch (e) {
-        setError(e);
-      }
+  const path = useCallback(
+    (c?: string | null) => {
+      const qs = new URLSearchParams({ locale });
+      if (c) qs.set("cursor", c);
+      if (creator) qs.set("creator", creator);
+      return `/memories?${qs}`;
     },
     [locale, creator],
   );
   useEffect(() => {
-    void load();
-  }, [load]);
+    let cancelled = false;
+    api<{ items: Memory[]; next_cursor: string | null }>(path()).then(
+      (r) => {
+        if (cancelled) return;
+        setItems(r.items);
+        setCursor(r.next_cursor);
+      },
+      (e) => !cancelled && setError(e),
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [path]);
+  async function load(c: string) {
+    try {
+      const r = await api<{ items: Memory[]; next_cursor: string | null }>(path(c));
+      setItems((prev) => [...(prev ?? []), ...r.items]);
+      setCursor(r.next_cursor);
+    } catch (e) {
+      setError(e);
+    }
+  }
   if (error) return <NotYet e={error} />;
   if (!items) return <Loading label={t("common.loading")} />;
   if (items.length === 0) return <EmptyState title={t("memories.none")} />;
