@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -83,10 +84,10 @@ def build_plan(db: Session, req: PlanRequest) -> dict:
     interests = {i.lower() for i in req.interests}
 
     def view(d: Destination) -> dict:
-        return localize_snapshot(d.published_snapshot, locale)
+        return localize_snapshot(d.published_snapshot or {}, locale)
 
     def score(d: Destination) -> int:
-        snap = d.published_snapshot
+        snap = d.published_snapshot or {}
         tags = {*(snap.get("interests") or []), (snap.get("category") or {}).get("slug", "")}
         return len(interests & {t.lower() for t in tags if t})
 
@@ -134,18 +135,19 @@ def build_plan(db: Session, req: PlanRequest) -> dict:
         if cur is None:
             nxt = remaining[0]
         else:
-            nxt = min(remaining, key=lambda c: haversine_km(cur, latlng(c[0].location)) if c[0].location is not None else 1e9)
+            here = cur
+            nxt = min(remaining, key=lambda c: haversine_km(here, latlng(c[0].location) or here) if c[0].location is not None else 1e9)
         ordered.append(nxt)
         remaining.remove(nxt)
         cur = latlng(nxt[0].location) if nxt[0].location is not None else cur
 
     segs = _segments(db, [c[0].id for c in ordered])
-    days = [{"day": i + 1, "stops": [], "known_minutes": 0, "unknowns": []} for i in range(req.days)]
+    days: list[dict[str, Any]] = [{"day": i + 1, "stops": [], "known_minutes": 0, "unknowns": []} for i in range(req.days)]
     di, prev = 0, None
     for d, v, level in ordered:
         loc = latlng(d.location) if d.location is not None else None
-        prev_loc = latlng(prev.location) if prev is not None and prev.location is not None else None
-        travel = travel_info(segs.get((prev.id, d.id)) if prev else None, prev_loc, loc) if prev else None
+        prev_loc: tuple[float, float] | None = latlng(prev.location) if prev is not None and prev.location is not None else None
+        travel: dict[str, Any] | None = travel_info(segs.get((prev.id, d.id)) if prev else None, prev_loc, loc) if prev else None
         need = (v.get("visit_duration_minutes") or 0) + ((travel or {}).get("duration_minutes") or 0)
         while di < req.days and (len(days[di]["stops"]) >= max_stops
                                  or (days[di]["stops"] and days[di]["known_minutes"] + need > day_minutes)):
@@ -211,11 +213,11 @@ def annotate_manual(db: Session, day_slugs: list[list[str]], locale: str) -> dic
         stops, prev, unknowns = [], None, []
         for slug in day:
             d = found[slug]
-            v = localize_snapshot(d.published_snapshot, locale)
+            v = localize_snapshot(d.published_snapshot or {}, locale)
             level, _ = advisory_level_for(advisories, d.id)
             if level in BLOCKING:
                 raise AppError(409, "advisory_blocked", f"{v['name']} is under an official advisory ({level}).")
-            travel = travel_info(segs.get((prev.id, d.id)), latlng(prev.location) if prev.location is not None else None,
+            travel: dict[str, Any] | None = travel_info(segs.get((prev.id, d.id)), latlng(prev.location) if prev.location is not None else None,
                                  latlng(d.location) if d.location is not None else None) if prev else None
             if v.get("visit_duration_minutes") is None:
                 unknowns.append(f"Visit duration unknown for {v['name']}")

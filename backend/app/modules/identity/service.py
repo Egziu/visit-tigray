@@ -17,8 +17,7 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.db import utcnow
 from app.core.errors import AppError
-from app.modules.identity.models import (OneTimeToken, Permission, Role, RolePermission, User, UserRole,
-                                         UserSession)
+from app.modules.identity.models import OneTimeToken, Permission, Role, RolePermission, User, UserRole, UserSession
 from app.modules.identity.permissions import PERMISSIONS, ROLES
 
 _ph = PasswordHasher()  # Argon2id, library defaults (RFC 9106 low-memory profile)

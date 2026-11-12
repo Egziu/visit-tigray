@@ -125,10 +125,11 @@ def provider_chain(mode: str) -> list[ChatProvider]:
     """Ordered providers permitted in ``mode``. Non-generative modes return an empty chain."""
     if mode == "fully_local":
         return local_providers()
+    cloud = cloud_provider()
     if mode == "local_first_cloud_fallback":
-        return local_providers() + ([cloud_provider()] if cloud_provider() else [])
+        return local_providers() + ([cloud] if cloud else [])
     if mode == "cloud_assisted":
-        return ([cloud_provider()] if cloud_provider() else []) + local_providers()
+        return ([cloud] if cloud else []) + local_providers()
     return []  # retrieval_only | deterministic | offline
 
 

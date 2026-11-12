@@ -78,7 +78,7 @@ class RateLimiter:
 
                 self._redis = redis.Redis.from_url(url, socket_timeout=0.5)
                 self._redis.ping()
-            except Exception:  # pragma: no cover - depends on infra
+            except (redis.RedisError, OSError):  # pragma: no cover - depends on infra
                 log.warning("redis unavailable; falling back to in-memory rate limiting")
                 self._redis = None
 

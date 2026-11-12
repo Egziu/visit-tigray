@@ -14,8 +14,7 @@ from app.core.db import utcnow
 from app.core.errors import AppError
 from app.core.ethiopic import fold_for_search, transliterate
 from app.core.i18n import norm_locale
-from app.modules.content.models import (Advisory, Category, Destination, DestinationRevision, DestinationTranslation,
-                                        PlaceAlias)
+from app.modules.content.models import Advisory, Category, Destination, DestinationRevision, DestinationTranslation, PlaceAlias
 
 COARSE_DECIMALS = 1  # ~11 km at Tigray's latitude
 ADVISORY_RANK = {"info": 0, "caution": 1, "avoid_nonessential": 2, "travel_not_advised": 3}

@@ -33,10 +33,11 @@ def _enabled() -> None:
 
 def discovery(http=None) -> dict:
     s = get_settings()
-    key = f"disc:{s.oidc_issuer}"
+    issuer = s.oidc_issuer or ""
+    key = f"disc:{issuer}"
     if key not in _cache or _cache[key][1] < time.time():
         with (http or guarded_client("oidc", "cloud_assisted", timeout=10)) as c:
-            doc = c.get(s.oidc_issuer.rstrip("/") + "/.well-known/openid-configuration").json()
+            doc = c.get(issuer.rstrip("/") + "/.well-known/openid-configuration").json()
         if doc.get("issuer") != s.oidc_issuer:
             raise AppError(502, "oidc_issuer_mismatch", "Identity provider issuer mismatch.")
         _cache[key] = (doc, time.time() + 3600)

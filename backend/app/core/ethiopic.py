@@ -92,7 +92,8 @@ def guess_language(text: str) -> str:
         return "und"
     if is_ethiopic(text):
         words = set(re.split(r"[\s፡-፨.,?!:;]+", nfc(text)))
-        ti, am = len(words & _TI_MARKERS), len(words & _AM_MARKERS)
+        ti: float = len(words & _TI_MARKERS)
+        am: float = len(words & _AM_MARKERS)
         # Tigrinya conventionally spells word-initial /a/ with ኣ (U+12A3), Amharic with አ (U+12A0).
         ti += 0.5 * len(re.findall(r"(?:^|\s)ኣ", text))
         am += 0.5 * len(re.findall(r"(?:^|\s)አ", text))

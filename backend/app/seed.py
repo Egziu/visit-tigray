@@ -108,12 +108,13 @@ def seed_content(db: Session) -> dict[str, Destination]:
                 d.translations.append(DestinationTranslation(destination_id=d.id, locale=loc, name=nm, summary="",
                                                              status="machine"))
             seen: set[str] = set()
-            for alias, loc in [(name, "en"), (ti, "ti"), (am, "am"), *[(a, None) for a in aliases]]:
+            pairs: list[tuple[str, str | None]] = [(name, "en"), (ti, "ti"), (am, "am"), *[(a, None) for a in aliases]]
+            for alias, loc_ in pairs:
                 norm = fold_for_search(alias)
                 if norm not in seen:
                     seen.add(norm)
-                    db.add(PlaceAlias(destination_id=d.id, name=alias, normalized=norm, locale=loc,
-                                      kind="official" if loc else "variant"))
+                    db.add(PlaceAlias(destination_id=d.id, name=alias, normalized=norm, locale=loc_,
+                                      kind="official" if loc_ else "variant"))
             db.flush()
             db.refresh(d)
             publish(db, d, None, note="Development seed")

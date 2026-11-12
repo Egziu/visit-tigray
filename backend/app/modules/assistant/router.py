@@ -19,6 +19,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db, utcnow
+from app.core.egress import EgressBlocked
 from app.core.errors import AppError
 from app.core.ethiopic import fold_for_search
 from app.modules.audit import service as audit
@@ -143,7 +144,7 @@ def ask(body: AskIn, request: Request, p: Principal = Depends(require("bureau.as
             if draft:
                 text, generated_by = draft, f"{provider.name}:{provider.model}"
                 break
-        except (ProviderError, ValueError, Exception):  # noqa: BLE001 - fall back to deterministic text
+        except (ProviderError, EgressBlocked, ValueError):  # noqa: S112 - fall back to deterministic text
             continue
     audit.record(db, action="assistant.ask", resource_type="assistant", resource_id=intent, actor=p, request=request)
     db.commit()

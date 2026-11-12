@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import date, datetime
-from typing import Literal
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel, Field, HttpUrl
@@ -17,8 +17,16 @@ from app.core.ethiopic import fold_for_search
 from app.core.i18n import norm_locale, pick
 from app.modules.audit import service as audit
 from app.modules.content import service as svc
-from app.modules.content.models import (Advisory, Category, Destination, DestinationRevision, DestinationTranslation,
-                                        Event, PlaceAlias, RouteSegment)
+from app.modules.content.models import (
+    Advisory,
+    Category,
+    Destination,
+    DestinationRevision,
+    DestinationTranslation,
+    Event,
+    PlaceAlias,
+    RouteSegment,
+)
 from app.modules.identity.deps import optional_principal, require
 from app.modules.identity.service import Principal
 
@@ -244,7 +252,7 @@ def update_destination(ident: uuid.UUID, body: DestinationPatch, request: Reques
     if d.status == "archived":
         raise AppError(409, "archived", "Restore the destination before editing.")
     data = body.model_dump(exclude_unset=True)
-    changes = {}
+    changes: dict[str, Any] = {}
     if "category_slug" in data:
         d.category_id = _category(db, body.category_slug)
         changes["category"] = body.category_slug

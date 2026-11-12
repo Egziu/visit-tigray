@@ -4,7 +4,7 @@ from __future__ import annotations
 import csv
 import io
 import re
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Literal
 
 from fastapi import APIRouter, Depends, Request
@@ -68,6 +68,10 @@ def collect(body: EventIn, db: Session = Depends(get_db)):
     return {"status": "accepted"}
 
 
+def _pairs(rows) -> dict[str, int]:
+    return {str(k): int(n) for k, n in rows}
+
+
 def _range(frm: date | None, to: date | None) -> tuple[date, date]:
     to = to or date.today()
     frm = frm or (to - timedelta(days=29))
@@ -77,7 +81,7 @@ def _range(frm: date | None, to: date | None) -> tuple[date, date]:
 
 
 def summary(db: Session, frm: date, to: date) -> dict:
-    by_type = dict(db.execute(select(AnalyticsEvent.event_type, func.count()).where(AnalyticsEvent.occurred_on.between(frm, to))
+    by_type = _pairs(db.execute(select(AnalyticsEvent.event_type, func.count()).where(AnalyticsEvent.occurred_on.between(frm, to))
                               .group_by(AnalyticsEvent.event_type)).all())
     by_day = [{"day": d.isoformat(), "count": n} for d, n in db.execute(
         select(AnalyticsEvent.occurred_on, func.count()).where(AnalyticsEvent.occurred_on.between(frm, to))
@@ -86,7 +90,7 @@ def summary(db: Session, frm: date, to: date) -> dict:
         select(AnalyticsEvent.destination_slug, func.count()).where(AnalyticsEvent.occurred_on.between(frm, to),
                                                                     AnalyticsEvent.destination_slug.is_not(None))
         .group_by(AnalyticsEvent.destination_slug).order_by(func.count().desc()).limit(10)).all()]
-    locales = dict(db.execute(select(AnalyticsEvent.locale, func.count()).where(AnalyticsEvent.occurred_on.between(frm, to),
+    locales = _pairs(db.execute(select(AnalyticsEvent.locale, func.count()).where(AnalyticsEvent.occurred_on.between(frm, to),
                                                                                 AnalyticsEvent.locale.is_not(None))
                               .group_by(AnalyticsEvent.locale)).all())
     terms = [{"term": t, "count": n} for t, n in db.execute(
@@ -94,15 +98,15 @@ def summary(db: Session, frm: date, to: date) -> dict:
                                                         AnalyticsEvent.term.is_not(None))
         .group_by(AnalyticsEvent.term).having(func.count() >= 3)  # k-anonymity threshold for search terms
         .order_by(func.count().desc()).limit(20)).all()]
-    start = datetime.combine(frm, time.min, tzinfo=timezone.utc)
+    start = datetime.combine(frm, time.min, tzinfo=UTC)
     end = start + timedelta(days=(to - frm).days + 1)
-    conf = dict(db.execute(select(Message.confidence, func.count()).where(Message.role == "assistant",
+    conf = _pairs(db.execute(select(Message.confidence, func.count()).where(Message.role == "assistant",
                                                                          Message.created_at >= start, Message.created_at < end)
                            .group_by(Message.confidence)).all())
     lat = db.execute(select(func.percentile_cont(0.5).within_group(Message.latency_ms),
                             func.percentile_cont(0.95).within_group(Message.latency_ms))
                      .where(Message.role == "assistant", Message.created_at >= start, Message.created_at < end)).one()
-    fb = dict(db.execute(select(Feedback.rating, func.count()).where(Feedback.created_at >= start, Feedback.created_at < end)
+    fb = _pairs(db.execute(select(Feedback.rating, func.count()).where(Feedback.created_at >= start, Feedback.created_at < end)
                          .group_by(Feedback.rating)).all())
     answered = sum(v for k, v in conf.items() if k in ("grounded", "partial"))
     total_ans = sum(conf.values())

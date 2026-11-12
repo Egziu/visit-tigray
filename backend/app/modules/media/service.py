@@ -114,7 +114,7 @@ def ingest_image(db: Session, data: bytes, *, owner_id, purpose: str, filename: 
         probe = Image.open(io.BytesIO(data))
         fmt = probe.format
         probe.verify()  # structural check
-        img = Image.open(io.BytesIO(data))
+        img: Image.Image = Image.open(io.BytesIO(data))
         img.load()
     except (UnidentifiedImageError, OSError, SyntaxError, Image.DecompressionBombError) as exc:
         raise AppError(415, "invalid_image", "The file is not a valid image.") from exc

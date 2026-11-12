@@ -73,7 +73,7 @@ packaging==26.3
     # via geoalchemy2
 pgvector==0.5.1
     # via -r requirements.in
-pillow==12.3.0
+pillow==13.0.0
     # via
     #   -r requirements.in
     #   fpdf2

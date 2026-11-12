@@ -17,8 +17,7 @@ from app.core.security import client_ip, rate_limit
 from app.modules.audit import service as audit
 from app.modules.identity import oidc
 from app.modules.identity import service as svc
-from app.modules.identity.deps import (CSRF_COOKIE, SESSION_COOKIE, current_principal, optional_principal,
-                                       require)
+from app.modules.identity.deps import CSRF_COOKIE, SESSION_COOKIE, current_principal, optional_principal, require
 from app.modules.identity.models import Permission, Role, RolePermission, User, UserRole
 from app.modules.identity.service import Principal
 from app.modules.platform.service import notify

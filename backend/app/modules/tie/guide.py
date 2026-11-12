@@ -136,7 +136,8 @@ def ask(db: Session, *, question: str, locale: str = "en", persona: str = "story
     screen = policy.screen_input(question)
     warnings = list(screen.warnings)
     if screen.decision == "refuse":
-        return _finish(db, conv, t0, policy.REFUSALS[screen.refusal_code].get(locale, policy.REFUSALS[screen.refusal_code]["en"]),
+        refusal = policy.REFUSALS[screen.refusal_code or "circumvention"]
+        return _finish(db, conv, t0, refusal.get(locale, refusal["en"]),
                        "refused", [], warnings + [f"refused:{screen.refusal_code}"], [], mode, None, "refusal")
 
     pol = get_setting(db, "ai_policy")

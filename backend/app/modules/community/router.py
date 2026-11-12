@@ -4,7 +4,7 @@ import json
 import re
 import uuid
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import Response
@@ -17,8 +17,18 @@ from app.core.errors import AppError, not_found
 from app.core.i18n import norm_locale
 from app.core.security import rate_limit
 from app.modules.audit import service as audit
-from app.modules.community.models import (Appeal, Block, Comment, ConsentRecord, CreatorProfile, Follow, Memory,
-                                          MemoryMedia, Report, SavedMemory)
+from app.modules.community.models import (
+    Appeal,
+    Block,
+    Comment,
+    ConsentRecord,
+    CreatorProfile,
+    Follow,
+    Memory,
+    MemoryMedia,
+    Report,
+    SavedMemory,
+)
 from app.modules.community.moderation import HOLD_FLAGS, flags_for
 from app.modules.content.models import Destination
 from app.modules.content.service import localize_snapshot
@@ -121,7 +131,8 @@ def feed(destination: str | None = None, featured: bool | None = None, locale: s
         q = q.where(Memory.author_id.not_in(blocked))
     rows = db.execute(q.order_by(Memory.published_at.desc(), Memory.id.desc()).limit(limit)).scalars().all()
     loc = norm_locale(locale)
-    nxt = f"{rows[-1].published_at.isoformat()}|{rows[-1].id}" if len(rows) == limit else None
+    last = rows[-1] if rows else None
+    nxt = f"{last.published_at.isoformat()}|{last.id}" if last is not None and last.published_at and len(rows) == limit else None
     return {"items": [memory_out(db, m, loc, viewer=p) for m in rows], "next_cursor": nxt}
 
 
@@ -507,7 +518,7 @@ def delete_me(body: DeleteMeIn, request: Request, p: Principal = Depends(current
 
 @router.get("/bureau/moderation/queue")
 def queue(_=Depends(require("community.moderate")), db: Session = Depends(get_db)):
-    items = []
+    items: list[dict[str, Any]] = []
     for m in db.execute(select(Memory).where(Memory.status == "pending").order_by(Memory.created_at)).scalars():
         u = db.get(User, m.author_id)
         items.append({"kind": "memory", "id": str(m.id), "title": m.title, "body": m.body, "author": u.display_name if u else "",

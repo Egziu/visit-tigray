@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 import uuid
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import Response
@@ -16,8 +16,7 @@ from app.core.errors import AppError, not_found
 from app.core.i18n import norm_locale, pick
 from app.core.security import rate_limit
 from app.modules.audit import service as audit
-from app.modules.awards.models import (Competition, CompetitionCategory, Entry, JudgeAssignment, Score, Sponsor,
-                                       WinnerProposal)
+from app.modules.awards.models import Competition, CompetitionCategory, Entry, JudgeAssignment, Score, Sponsor, WinnerProposal
 from app.modules.community.models import ConsentRecord, CreatorProfile, Memory
 from app.modules.identity.deps import current_principal, require, verified_principal
 from app.modules.identity.models import User
@@ -50,7 +49,7 @@ def comp_out(db: Session, c: Competition, locale: str, staff: bool = False) -> d
     cats = db.execute(select(CompetitionCategory).where(CompetitionCategory.competition_id == c.id)).scalars()
     now = utcnow()
     is_live = c.status == "open" and (c.opens_at is None or c.opens_at <= now) and (c.closes_at is None or c.closes_at > now)
-    out = {"slug": c.slug, "title": pick(c.title_i18n, locale)[0], "description": pick(c.description_i18n, locale)[0],
+    out: dict[str, Any] = {"slug": c.slug, "title": pick(c.title_i18n, locale)[0], "description": pick(c.description_i18n, locale)[0],
            "rules": pick(c.rules_i18n, locale)[0], "eligibility": pick(c.eligibility_i18n, locale)[0],
            "prize_description": pick(c.prize_description_i18n, locale)[0] or None, "status": c.status,
            "opens_at": c.opens_at.isoformat() if c.opens_at else None,
@@ -72,7 +71,7 @@ def shingles(text: str, k: int = 5) -> set[str]:
 
 def integrity_checks(db: Session, c: Competition, e: Entry) -> list[dict]:
     """Duplicate-image (dHash) and text-overlap (5-gram Jaccard) signals for human review."""
-    flags = []
+    flags: list[dict[str, Any]] = []
     others = db.execute(select(Entry).where(Entry.competition_id == c.id, Entry.id != e.id)).scalars().all()
     if e.media_id:
         mine = db.get(MediaAsset, e.media_id)
@@ -147,7 +146,7 @@ def submit_entry(slug: str, body: EntryIn, request: Request, p: Principal = Depe
     count = db.execute(select(func.count()).select_from(Entry).where(
         Entry.competition_id == c.id, Entry.category_key == body.category_key, Entry.entrant_id == p.id,
         Entry.status != "withdrawn")).scalar()
-    if count >= c.max_entries_per_category:
+    if (count or 0) >= c.max_entries_per_category:
         raise AppError(409, "entry_limit", "You have reached the entry limit for this category.")
     if body.media_id:
         a = db.get(MediaAsset, body.media_id)
@@ -444,7 +443,7 @@ def judge_entries(slug: str, p: Principal = Depends(require("awards.judge")), db
         if str(e.id) in (a.conflicted_entry_ids or []):
             continue
         media = db.get(MediaAsset, e.media_id) if e.media_id else None
-        item = {"id": str(e.id), "category_key": e.category_key, "title": e.title, "statement": e.statement,
+        item: dict[str, Any] = {"id": str(e.id), "category_key": e.category_key, "title": e.title, "statement": e.statement,
                 "media_preview": sign(str(media.id), "lg") if media else None,
                 "my_score": None}
         s = db.execute(select(Score).where(Score.entry_id == e.id, Score.judge_id == p.id)).scalar_one_or_none()
