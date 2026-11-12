@@ -470,12 +470,30 @@ def export_my_data(p: Principal = Depends(current_principal), db: Session = Depe
         "inquiries": [{"provider_id": str(q.provider_id), "message": q.message, "reply": q.reply,
                        "created_at": q.created_at.isoformat()}
                       for q in db.execute(select(Inquiry).where(Inquiry.visitor_id == u.id)).scalars()],
+        **_social_export(db, u.id),
         "guide_conversations": [{"id": str(c.id), "messages": [{"role": m.role, "content": m.content} for m in db.execute(
             select(Message).where(Message.conversation_id == c.id).order_by(Message.created_at)).scalars()]}
             for c in db.execute(select(Conversation).where(Conversation.owner_id == u.id)).scalars()],
     }
     return Response(json.dumps(data, ensure_ascii=False, indent=1), media_type="application/json",
                     headers={"Content-Disposition": 'attachment; filename="visit-tigray-my-data.json"'})
+
+
+def _social_export(db: Session, user_id) -> dict:
+    from app.modules.social.models import JournalComment, JournalPost, Publication, SpaceMessage, Subscription
+    pub = db.get(Publication, user_id)
+    return {
+        "publication": {"name": pub.name, "tagline": pub.tagline, "about": pub.about} if pub else None,
+        "journal_posts": [{"id": str(x.id), "title": x.title, "subtitle": x.subtitle, "blocks": x.blocks, "status": x.status,
+                           "created_at": x.created_at.isoformat()}
+                          for x in db.execute(select(JournalPost).where(JournalPost.author_id == user_id)).scalars()],
+        "journal_comments": [{"post_id": str(c.post_id), "body": c.body, "created_at": c.created_at.isoformat()}
+                             for c in db.execute(select(JournalComment).where(JournalComment.author_id == user_id)).scalars()],
+        "subscriptions": [{"publication_user_id": str(x.publication_id), "email_digest": x.email_digest}
+                          for x in db.execute(select(Subscription).where(Subscription.subscriber_id == user_id)).scalars()],
+        "space_messages": [{"id": m.id, "body": m.body, "status": m.status, "created_at": m.created_at.isoformat()}
+                           for m in db.execute(select(SpaceMessage).where(SpaceMessage.author_id == user_id)).scalars()],
+    }
 
 
 class DeleteMeIn(BaseModel):
@@ -500,6 +518,23 @@ def delete_me(body: DeleteMeIn, request: Request, p: Principal = Depends(current
         storage().delete_prefix(a.storage_prefix)
         db.delete(a)
     db.execute(delete(Comment).where(Comment.author_id == u.id))
+    from app.modules.social.models import (
+        JournalComment,
+        JournalLike,
+        JournalPost,
+        MessageReaction,
+        Publication,
+        SpaceMember,
+        SpaceMessage,
+        Subscription,
+    )
+    for model, col in ((JournalLike, JournalLike.user_id), (JournalComment, JournalComment.author_id),
+                       (JournalPost, JournalPost.author_id), (Subscription, Subscription.subscriber_id),
+                       (Subscription, Subscription.publication_id), (Publication, Publication.user_id),
+                       (MessageReaction, MessageReaction.user_id), (SpaceMember, SpaceMember.user_id)):
+        db.execute(delete(model).where(col == u.id))
+    # Messages are erased (not just anonymised); replies keep a "[removed]" placeholder via SET NULL.
+    db.execute(delete(SpaceMessage).where(SpaceMessage.author_id == u.id))
     db.execute(delete(Itinerary).where(Itinerary.owner_id == u.id))
     db.execute(delete(Conversation).where(Conversation.owner_id == u.id))
     db.execute(delete(CreatorProfile).where(CreatorProfile.user_id == u.id))

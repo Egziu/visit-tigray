@@ -218,3 +218,21 @@ def test_guide_actions_suggestions_and_history(visitor, client, db, seeded):  # 
     assert len(client.get("/api/tie/suggestions?locale=ti").json()) >= 3
     dest = client.get("/api/tie/suggestions?destination=aksum").json()
     assert dest[0]["category"] == "destination" and "Aksum" in dest[0]["text"]
+
+
+def test_export_and_erasure_cover_social_content(visitor, staff, client, spaces_seeded, db):
+    v, other = visitor(name="Leaving Writer"), visitor(name="Stays")
+    pid = v.post("/api/journal", json=post_body()).json()["id"]
+    v.post("/api/spaces/travellers-lounge/join")
+    other.post("/api/spaces/travellers-lounge/join")
+    url = "/api/spaces/travellers-lounge/channels/general/messages"
+    mine = v.post(url, json={"body": "my message"}).json()
+    reply = other.post(url, json={"body": "a reply", "reply_to": mine["id"]}).json()
+    data = json.loads(v.get("/api/me/export").content)
+    assert data["journal_posts"][0]["id"] == pid and data["space_messages"][0]["body"] == "my message"
+    assert v.request("DELETE", "/api/me", json={"confirm": "DELETE", "password": "Correct-Horse-Battery-9"}).status_code == 200
+    from app.modules.social.models import JournalPost, SpaceMessage
+    db.expire_all()
+    assert db.get(JournalPost, pid) is None and db.get(SpaceMessage, mine["id"]) is None
+    survivor = next(m for m in client.get(url).json()["items"] if m["id"] == reply["id"])
+    assert survivor["reply_to"] is None and survivor["body"] == "a reply"
