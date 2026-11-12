@@ -48,9 +48,29 @@ class ChatProvider:
     def _client(self, mode: str):
         return guarded_client("ai_inference", mode, timeout=get_settings().ai_timeout_seconds, transport=self.transport)
 
+    probe_path = "/"
+
+    def available(self, mode: str) -> bool:
+        """Cheap reachability probe (cached 30 s). Never raises."""
+        key = (self.name, self.base_url, mode)
+        hit = _PROBE_CACHE.get(key)
+        if hit and hit[1] > time.time():
+            return hit[0]
+        try:
+            with guarded_client("ai_inference", mode, timeout=2.0, transport=self.transport) as c:
+                ok = c.get(self.base_url + self.probe_path).status_code < 500
+        except (EgressBlocked, httpx.HTTPError):
+            ok = False
+        _PROBE_CACHE[key] = (ok, time.time() + 30)
+        return ok
+
+
+_PROBE_CACHE: dict[tuple, tuple[bool, float]] = {}
+
 
 class OllamaProvider(ChatProvider):
     name = "ollama"
+    probe_path = "/api/tags"
 
     def __init__(self, base_url: str, model: str):
         self.base_url, self.model = base_url.rstrip("/"), model
@@ -78,6 +98,8 @@ class OllamaProvider(ChatProvider):
 
 class OpenAICompatibleProvider(ChatProvider):
     """llama.cpp server, vLLM, or (cloud-assisted modes only) a hosted OpenAI-compatible API."""
+
+    probe_path = "/v1/models"
 
     def __init__(self, name: str, base_url: str, model: str, api_key: str | None = None):
         self.name, self.base_url, self.model, self.api_key = name, base_url.rstrip("/"), model, api_key

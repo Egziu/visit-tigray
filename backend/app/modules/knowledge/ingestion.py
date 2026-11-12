@@ -89,6 +89,15 @@ def screen_for_injection(text: str) -> list[str]:
     return flags
 
 
+def _tail_words(text: str, max_chars: int) -> str:
+    """Last ~max_chars of text, starting at a word boundary (never mid-word)."""
+    if len(text) <= max_chars:
+        return text
+    tail = text[-max_chars:]
+    cut = re.search(r"\s", tail)
+    return tail[cut.end():] if cut else ""
+
+
 def chunk_text(text: str, target_chars: int = 900, overlap_chars: int = 150) -> list[str]:
     """Paragraph-aware chunking with overlap. Ethiopic sentence ends (።) are respected."""
     paras = [p.strip() for p in re.split(r"\n\s*\n", text) if p.strip()]
@@ -102,7 +111,7 @@ def chunk_text(text: str, target_chars: int = 900, overlap_chars: int = 150) -> 
         for s in sentences:
             if buf and len(buf) + len(s) + 1 > target_chars:
                 chunks.append(buf.strip())
-                buf = buf[-overlap_chars:] + " " + s if overlap_chars else s
+                buf = _tail_words(buf, overlap_chars) + " " + s if overlap_chars else s
             else:
                 buf = f"{buf}\n\n{s}" if buf else s
     if buf.strip():

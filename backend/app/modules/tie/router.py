@@ -33,10 +33,11 @@ def status(db: Session = Depends(get_db)):
     pol = get_setting(db, "ai_policy")
     mode = guide.effective_mode(db)
     chain = get_chain(mode)
-    first = chain[0] if chain else None
+    first = next((p for p in chain if p.available(mode)), None)
     return {"mode": mode, "permitted_modes": pol.get("permitted_modes", []),
-            "generative": bool(chain),
-            "provider": {"name": first.name, "model": first.model, "local": first.local} if first else None,
+            "generative": first is not None,
+            "provider": {"name": first.name, "model": first.model, "local": first.local, "available": True} if first else None,
+            "configured_providers": [{"name": p.name, "model": p.model, "local": p.local} for p in chain],
             "notice": "Answers come only from approved, cited sources. Verify official information before travelling."}
 
 

@@ -256,3 +256,24 @@ def test_evaluation_suite_security_categories_pass(staff, db, seeded):
                 "outdated_travel"):
         assert report["by_category"][cat] == 1.0, (cat, report["by_category"])
     assert admin.get("/api/bureau/ai/evaluations").json()[0]["pass_rate"] == report["pass_rate"]
+
+
+def test_chunk_overlap_never_starts_mid_word():
+    from app.modules.knowledge.ingestion import chunk_text
+    text = "\n\n".join(f"Paragraph {i}: the Kingdom of Aksum minted coins and traded widely across the Red Sea." for i in range(40))
+    for c in chunk_text(text)[1:]:
+        assert c[0].isupper() or c.startswith(("the", "and", "of", "Kingdom", "Aksum", "minted", "coins", "traded",
+                                               "widely", "across", "Red", "Sea", "Paragraph")) or not c[0].isalpha(), c[:30]
+        first_word = c.split()[0].strip(":.")
+        assert first_word in text.split() or first_word.rstrip(":") in {w.rstrip(":.") for w in text.split()}
+
+
+def test_status_reports_unreachable_provider_honestly(client, db):
+    set_mode(db, "fully_local")
+    providers._PROBE_CACHE.clear()
+    providers._override = [providers.OllamaProvider("http://127.0.0.1:9", "absent-model")]  # nothing listens on port 9
+    try:
+        s = client.get("/api/tie/status").json()
+    finally:
+        providers._override = None
+    assert s["generative"] is False and s["provider"] is None and s["configured_providers"][0]["model"] == "absent-model"
