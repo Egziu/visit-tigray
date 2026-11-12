@@ -12,6 +12,10 @@
 | Consent records | kind, version, time, withdrawal | proof of consent | life of the account plus a legal period (to confirm) |
 | Itineraries | saved plans and versions | user feature | until deletion |
 | Provider inquiries | message, dates, group size | contact a provider | proposed 24 months |
+| Journal posts, comments, likes | posts, comments, likes | publication after review | until the author deletes them |
+| Subscriptions | subscriber ↔ publication, email-digest opt-in | delivering new-post notices | until unsubscribe |
+| Space messages & reactions | chat messages, reactions | community conversation | proposed 24 months (to confirm); removed on account deletion |
+| In-app notifications | title, link | notices to the user | proposed 90 days |
 | Guide conversations | questions and answers | conversation context, quality | **30 days** (automatic purge) |
 | Analytics events | event type, day, destination, locale, scrubbed search term | aggregate insight | proposed 25 months; **no user id, IP or session** |
 | Audit log | actor, action, IP, request id | security and accountability | append-only; legal period to confirm |

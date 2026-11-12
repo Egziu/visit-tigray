@@ -16,7 +16,7 @@ AI guide (the **Tigray Intelligence Engine**); a deterministic trip planner; the
 
 | Area | Highlights |
 |---|---|
-| Backend (`backend/`) | FastAPI modular monolith · PostgreSQL 16 + PostGIS + pgvector · Alembic migrations · 157 API operations |
+| Backend (`backend/`) | FastAPI modular monolith · PostgreSQL 16 + PostGIS + pgvector · Alembic migrations · 159 API paths |
 | Identity & security | Argon2id · server sessions + CSRF · TOTP MFA for all staff permissions · OIDC/Keycloak · data-driven roles · append-only hash-chained audit · least-privilege DB roles |
 | CMS | Editor-defined categories · working copy + published snapshots · review/schedule/rollback · en/ti/am with human translation review · protected coordinates · advisories · Ethiopian calendar |
 | Media | Upload validation, re-encoding, EXIF/GPS stripping, malware-scan hook, rights and "illustration/reconstruction" labels, duplicate detection |
@@ -37,7 +37,7 @@ docker compose up -d --build    # db, redis, migrate, api, worker, web
 Without Docker, and for the dev seed with an admin account, see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ```bash
-cd backend && .venv/bin/pytest          # 84 tests against a throwaway PostgreSQL database
+cd backend && .venv/bin/pytest          # 106 tests against a throwaway PostgreSQL database
 .venv/bin/python -m app.modules.tie.evaluation --mode retrieval_only
 ```
 

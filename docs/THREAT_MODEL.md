@@ -60,6 +60,9 @@ flowchart LR
 | T17 | I | XSS | React escaping; API CSP `default-src 'none'`; no HTML rendering of user content | Web CSP must be verified in deployment (see frontend docs) |
 | T18 | I | Secrets in repository | `.gitignore`, `.env.example` placeholders, gitleaks in CI, production config validation | — |
 | T19 | E | Vulnerable dependencies | pip-audit / npm audit in CI, SBOM, locked versions | Patch cadence needs an owner |
+| T21 | T/I | Abuse in real-time Spaces (spam, harassment, doxxing) | verified email + membership; held messages for risky signals; slow mode; restrictions that survive leave/rejoin; blocks; reports; moderator removal; rate limits | Heuristic signals only; local classifier planned |
+| T22 | D | Stream exhaustion (many open SSE connections) | 55 s stream lifetime with reconnect; per-IP rate limits on HTTP; streams close their DB session between polls | Thread-per-stream model, so measure at scale (ADR-0008) |
+| T23 | I | Newsletter email abuse | only opt-in subscribers (consent recorded), one email per post (idempotency key), personal channel only | Unsubscribe link in email body planned |
 | T20 | D | Connectivity loss | PWA offline cache, retrieval-only AI, edge profile | Edge deployment not yet rehearsed |
 
 ## 4. Known gaps that block production

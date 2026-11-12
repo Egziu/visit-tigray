@@ -5,6 +5,11 @@ All notable changes are listed here. The project follows semantic versioning fro
 ## [Unreleased] — 2.0.0-dev
 
 ### Added
+- Visit Tigray logo across the site, PWA icons, favicon and social-share image.
+- Journals (Substack-like publications, subscriptions and email digests) and Spaces (Discord-like channels with live SSE
+  updates, replies, reactions, slow mode, held messages); in-app notifications.
+- Guide action chips (open planner / destination), conversation history and starter prompts; planner summary, pre-travel
+  checklist, per-stop alternatives and server-validated drag-and-drop editing.
 - Modular FastAPI backend on PostgreSQL 16 + PostGIS + pgvector, with Alembic migrations 0001–0004.
 - Identity: Argon2id passwords, server-side sessions, CSRF, lockout, email verification, password reset, TOTP MFA for staff,
   OIDC (authorization code + PKCE), configurable roles and permissions.

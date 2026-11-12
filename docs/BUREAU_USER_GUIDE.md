@@ -53,6 +53,12 @@ guide instantly. Sacred or restricted material needs the custodian's approval re
 **Moderation queue:** read the story and check any flags (contact details, coordinates, spam words). Flags are hints only; **you**
 decide. Approve or reject with a short note; the author is informed. Appeals must be decided by a *different* moderator.
 
+### Journals and Spaces
+Journal stories appear in the **Moderation queue** like visitor stories. Approving one publishes it and notifies its subscribers
+once. Space messages are live, but messages with warning signs are **held**: only the author and moderators see them until you
+approve or remove them. For a heated channel, turn on **slow mode**. To pause a person, set a time-limited **restriction**; they
+cannot get around it by leaving and rejoining the space.
+
 ### Run a competition (when authorized)
 The competition cannot open until legal terms, funding and Bureau authorization are each recorded **by a different person**, and an
 administrator turns on live competitions with a written justification. Judges declare conflicts before scoring, and winners need a

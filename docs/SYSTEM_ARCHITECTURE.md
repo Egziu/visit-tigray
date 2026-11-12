@@ -75,6 +75,7 @@ flowchart LR
 | `awards` | Competitions, gates, rubrics, entries, judging, COI, winners, fulfilment, certificates | competitions, competition_* | `awards.manage/authorize/judge/approve_winners/finance` |
 | `analytics` | Consent-gated engagement events, measured tourism, summaries, exports | analytics_events, tourism_measurements | `analytics.view`, `reports.export`, `tourism_stats.record` |
 | `assistant` | Bureau AI assistant (read-only, permission-scoped) | — | `bureau.assistant` + per-intent permission |
+| `social` | **Journals** (Substack-like publications, block-based long-form posts, likes, threaded comments, subscriptions with email digests), **Spaces** (Discord-like spaces/channels, membership, roles, slow mode, replies, reactions, SSE live stream), in-app notifications | publications, journal_posts, journal_likes, journal_comments, publication_subscriptions, spaces, space_channels, space_members, space_messages, space_message_reactions | verified accounts + membership; space moderators; `community.moderate` |
 
 The editorial calendar, task assignments and integration management are **planned**. `editorial.assign` exists in the permission
 catalogue, but the task tables are not built yet (see `docs/ROADMAP.md`).
@@ -115,7 +116,20 @@ access is unknown, and says why. Verified road segments supply distance and time
 straight-line distance labelled as such, and the travel time is *unknown*. Costs and weather are not estimated. Manual edits are
 re-validated and re-annotated server-side.
 
-### 4.5 Governance rules enforced in code
+### 4.5 Social platform (Journals & Spaces)
+Journal posts are **pre-moderated**: nothing is published automatically. They are stored as structured blocks
+(paragraph/heading/quote/image/divider), never HTML. Subscribers get in-app notifications, plus email if they opted in (consent
+recorded), exactly once per post. Space messages are **post-moderated** so conversation can happen in real time. Messages with
+risky signals are *held* (visible only to the author and moderators). Membership, verified email, slow mode, time-limited
+restrictions, block lists and rate limits apply. Live delivery uses Server-Sent Events (ADR-0008).
+
+### 4.6 Guide & planner hand-off
+The guide returns deterministic **action chips**: `open_planner` with parsed days and interests, and `open_destination` from
+cited evidence. Every plan carries a **summary**, a **pre-travel checklist** (permits, advisories, unknown accessibility, stale
+verification, unknown durations, unverified legs) and per-stop **alternatives**. `POST /api/planner/annotate` re-validates
+drag-and-drop edits server-side, so clients can never assert distances, durations or blocked stops.
+
+### 4.7 Governance rules enforced in code
 * **Four-eyes:** translation approval, knowledge approval, competition gates, winner approval and appeals each need a different person.
 * **Conflict of interest:** moderators can't moderate their own content; verifiers can't verify providers they belong to; judges declare
   conflicts and can't score conflicted entries; staff and judges can't enter competitions.
@@ -124,7 +138,7 @@ re-validated and re-annotated server-side.
 
 ## 5. API specification
 
-The OpenAPI 3 document is exported to `docs/api/openapi.json` (133 paths, 157 operations at the time of writing) and served at
+The OpenAPI 3 document is exported to `docs/api/openapi.json` (159 paths at the time of writing) and served at
 `/api/docs` when `EXPOSE_API_DOCS=true`. Conventions:
 
 * JSON everywhere except uploads (multipart) and exports (CSV, XLSX, PDF, ICS).
