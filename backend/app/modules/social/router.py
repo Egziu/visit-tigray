@@ -784,6 +784,7 @@ def stream(slug: str, channel: str, request: Request, after: int = 0, db: Sessio
     def gen() -> Iterator[str]:
         last_id, last_upd, started, last_ping = after, update_cursor, time.monotonic(), time.monotonic()
         yield "retry: 3000\n\n"
+        yield _sse("ready", {"after": after})  # lets clients detect a working (unbuffered) stream immediately
         while time.monotonic() - started < STREAM_SECONDS:
             with session_factory()() as s2:
                 viewer = None
@@ -813,7 +814,8 @@ def stream(slug: str, channel: str, request: Request, after: int = 0, db: Sessio
         yield _sse("reconnect", {"after": last_id})
 
     return StreamingResponse(gen(), media_type="text/event-stream",
-                             headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no", "Connection": "keep-alive"})
+                             headers={"Cache-Control": "no-store, no-transform",  # no-transform: proxies/compressors must not gzip-buffer events
+                                      "X-Accel-Buffering": "no", "Connection": "keep-alive"})
 
 
 # ------------------------------------------------------------------ space administration (bureau)

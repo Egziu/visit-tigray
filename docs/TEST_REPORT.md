@@ -10,10 +10,10 @@ Authoring host: 4 vCPU Intel Xeon @ 2.1 GHz, 15 GB RAM, PostgreSQL 16.x + PostGI
 
 | Check | Command | Result |
 |---|---|---|
-| Unit + integration + API tests | `cd backend && .venv/bin/pytest` | **98 passed** (≈62 s, real PostgreSQL; a fresh database is migrated by Alembic per run) |
+| Unit + integration + API tests | `cd backend && .venv/bin/pytest` | **107 passed** (incl. 9 Journals/Spaces tests; real PostgreSQL, real PostgreSQL; a fresh database is migrated by Alembic per run) |
 | Line coverage | `pytest --cov=app` | **90%** (5,756 statements; measured at 96 tests) |
 | Lint | `ruff check .` | clean |
-| Types | `mypy app` | no issues (75 files) |
+| Types | `mypy app` | no issues (78 files) |
 | Security lint | `bandit -c pyproject.toml -r app` | 0 issues |
 | Dependency audit | `pip-audit -r requirements.lock` / dev lock | no known vulnerabilities (after Pillow 12.3.0 → 13.0.0, which fixed 40 advisories) |
 | Migrations | `alembic upgrade head` → `downgrade base` → `upgrade head` → `alembic check` | pass; "No new upgrade operations detected" |
@@ -52,12 +52,17 @@ LLM generation quality is **not measured** (no weights or GPU reachable).
 | Check | Result |
 |---|---|
 | `npm run lint` / `typecheck` / `build` | pass |
-| Vitest | **24 passed** |
-| Playwright e2e (headless Chromium) | **30 passed**: locales, destinations, cross-lingual search, live guide with citations, planner, Bureau sign-in gate, offline cache, mobile 390×844 without horizontal scroll |
+| Vitest | **36 passed** |
+| Playwright e2e (headless Chromium) | **45 passed**: locales, destinations, cross-lingual search, live guide with citations, planner, Bureau sign-in gate, offline cache, mobile 390×844 without horizontal scroll, Journals and Spaces signed out, and **signed in with two synthetic users**: live chat delivery and reactions over SSE without reload, Journal submission entering human review, saving an itinerary |
 | axe-core (WCAG 2.0/2.1/2.2 A+AA) | **0 serious/critical** violations on 10 pages |
 
 Five frontend defects were found by these tests and fixed (contrast 1.11:1, every destination page 404ing, missing `lang` on 404,
 guide crash after answering, nested-interactive map).
+
+The signed-in chat test then found a sixth: **Server-Sent Events were buffered** when proxied through the Next.js server, because it
+gzip-compressed `text/event-stream` responses, so messages only appeared after polling. Fixed by sending
+`Cache-Control: no-store, no-transform` and `X-Accel-Buffering: no`, emitting an immediate `ready` event, and only showing "Live" in
+the UI after that event arrives (otherwise a 6 s watchdog falls back to polling and says so).
 
 ## 4. Operations rehearsals
 
@@ -76,6 +81,6 @@ because the per-IP AI rate limit (20/min) worked as designed with all virtual us
 * Real local-LLM quality and latency benchmarks (blocked: no weights or GPU).
 * Live ClamAV, SMTP, Keycloak and S3 integrations (protocol-level tests or mocks only).
 * Manual screen-reader audits (en/ti/am), real-device mobile testing, native-speaker review.
-* Signed-in browser e2e for memories, itineraries and Bureau editing (covered by API tests, not by browser tests).
+* Signed-in browser e2e for memories and Bureau editing (covered by API tests; Spaces, Journals and itineraries now have browser tests).
 * Independent penetration test.
 * Point-in-time recovery rehearsal; production-sized restore timing.

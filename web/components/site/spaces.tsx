@@ -13,6 +13,7 @@ import { useI18n, useSession } from "./providers";
 export const EMOJIS = ["👍", "❤️", "🙏", "😂", "😮", "🎉", "🌄", "☕"] as const;
 const GROUP_WINDOW_MS = 5 * 60_000;
 const POLL_MS = 4000;
+const READY_TIMEOUT_MS = 6_000;
 const GUIDELINES_KEY = "vt_spaces_guidelines_v1";
 
 /* ================================================================== data */
@@ -295,7 +296,7 @@ function ChannelView({ space, channel, onJoined }: { space: Space; channel: Chan
     };
   }, [base, t]);
 
-  // Live updates: SSE first, polling fallback after repeated errors.
+  // Live updates: SSE first; polling fallback after repeated errors or when no `ready` event arrives.
   useEffect(() => {
     if (messages === null || error) return;
     let es: EventSource | null = null;
@@ -317,10 +318,18 @@ function ChannelView({ space, channel, onJoined }: { space: Space; channel: Chan
       if (closed) return;
       if (typeof EventSource === "undefined") return startPolling();
       es = new EventSource(`/api${base}/stream?after=${lastId.current}`);
-      es.onopen = () => {
+      // An open connection is not proof of delivery: a buffering/compressing proxy can hold events back.
+      // Only the server's immediate `ready` event marks the stream live; otherwise fall back to polling.
+      const watchdog = setTimeout(() => {
+        if (closed) return;
+        es?.close();
+        startPolling();
+      }, READY_TIMEOUT_MS);
+      es.addEventListener("ready", () => {
+        clearTimeout(watchdog);
         failures = 0;
         setLive("live");
-      };
+      });
       es.addEventListener("message", (ev) => {
         try {
           applyIncoming([JSON.parse((ev as MessageEvent).data) as SpaceMessage]);
@@ -348,6 +357,7 @@ function ChannelView({ space, channel, onJoined }: { space: Space; channel: Chan
         setTimeout(connect, 250);
       });
       es.onerror = () => {
+        clearTimeout(watchdog);
         es?.close();
         failures += 1;
         if (failures >= 3) startPolling();

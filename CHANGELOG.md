@@ -33,5 +33,9 @@ All notable changes are listed here. The project follows semantic versioning fro
 - Pillow upgraded to 13.0.0 (pip-audit reported 40 known vulnerabilities in 12.3.0).
 - Fixed: live destinations disappeared from public view while a draft edit was pending.
 
+### Fixed
+- Spaces live updates were buffered by gzip in the Next.js proxy; the stream now opts out of transforms and the UI only claims
+  "Live" after the server's `ready` event.
+
 ## [0.1.0] — prototype
 - Single-file FastAPI + SQLite prototype with static page, curated planner, moderated memories and token-gated admin.

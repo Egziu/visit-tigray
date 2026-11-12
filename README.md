@@ -37,7 +37,7 @@ docker compose up -d --build    # db, redis, migrate, api, worker, web
 Without Docker, and for the dev seed with an admin account, see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ```bash
-cd backend && .venv/bin/pytest          # 106 tests against a throwaway PostgreSQL database
+cd backend && .venv/bin/pytest          # 107 tests against a throwaway PostgreSQL database
 .venv/bin/python -m app.modules.tie.evaluation --mode retrieval_only
 ```
 

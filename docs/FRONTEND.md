@@ -70,8 +70,8 @@ Run against the backend at commit `9c675dd` with the development seed (6 synthet
 | `npm run lint` | 0 problems |
 | `npm run typecheck` | pass |
 | `npm run build` | pass (all routes compiled) |
-| `npm test` (Vitest) | **24 passed** (3 files: API helper incl. CSRF and error parsing, i18n completeness and placeholders, formatting) |
-| `npm run e2e` (Playwright) | **30 passed** (34.7 s) |
+| `npm test` (Vitest) | **36 passed** |
+| `npm run e2e` (Playwright) | **45 passed** (58.8 s; latest run at `26344b2` + SSE fix, with two synthetic signed-in users) |
 
 E2E coverage:
 - **Locales:** `/` redirect; home in en/ti/am with `lang` and the review notice.
@@ -80,6 +80,7 @@ E2E coverage:
 - **Mobile:** no horizontal scroll at 390×844 on 6 pages; the mobile menu works.
 - **Live API:** guide answer with citations, `[n]` links and provenance; planner day plan with reasons and notice.
 - **Bureau:** sign-in gate.
+- **Social (signed in):** two browsers in one Space channel see each other's message and 🎉 reaction live without reload; Journal submission requires consent and stays private until review; itinerary save.
 - **Offline:** cached destination page and offline library work with the network disabled; private pages and APIs are never present in caches.
 
 Defects found and fixed during testing:
@@ -88,6 +89,7 @@ Defects found and fixed during testing:
 3. Unmatched locale paths rendered Next's bare 404 without `lang`. Fixed with a localized `[...rest]` catch-all and `not-found`.
 4. The guide crashed after an answer: modern `scrollIntoView()` returns a Promise, which an expression-bodied `useEffect` returned as its "cleanup".
 5. The SVG map used `role="img"` while containing links (nested-interactive). Changed to `role="group"`.
+6. Space SSE streams were gzip-buffered by the Next.js server, so "live" chat only updated by polling. The API now sends `no-transform` and an immediate `ready` event; the UI shows "Live" only after it arrives.
 
 Screenshots (deviceScaleFactor 2) are in `docs/screenshots/`: `home.png`, `destination-detail.png`, `guide.png`, `bureau-dashboard.png`, `bureau-destinations.png`. Regenerate them with `node scripts/screenshots.mjs ../docs/screenshots`.
 
