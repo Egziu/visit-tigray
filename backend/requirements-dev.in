@@ -1,0 +1,10 @@
+-c requirements.lock
+pytest>=8.3,<10
+pytest-cov>=6,<8
+ruff>=0.8
+mypy>=1.13
+types-redis
+pip-audit>=2.7
+bandit>=1.8
+cyclonedx-bom>=5
+locust>=2.32
