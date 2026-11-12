@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
@@ -7,18 +8,72 @@ import { getSaver, getTheme, setSaver, setTheme, subscribePrefs, type Theme } fr
 import { cn } from "@/components/ui";
 import { LOCALE_NAMES, LOCALES, type MsgKey } from "@/lib/i18n";
 import { api } from "@/lib/api";
-import { Emblem } from "./illustrations";
+import { NotificationBell } from "./notifications";
 import { useI18n, useSession } from "./providers";
 
 const NAV: { href: string; key: MsgKey }[] = [
-  { href: "/destinations", key: "nav.destinations" },
-  { href: "/map", key: "nav.map" },
-  { href: "/events", key: "nav.events" },
+  { href: "/destinations", key: "nav.discover" },
   { href: "/guide", key: "nav.guide" },
   { href: "/plan", key: "nav.plan" },
+  { href: "/journal", key: "nav.journal" },
+  { href: "/spaces", key: "nav.spaces" },
   { href: "/memories", key: "nav.memories" },
-  { href: "/providers", key: "nav.providers" },
+  { href: "/events", key: "nav.events" },
 ];
+const MORE: { href: string; key: MsgKey }[] = [
+  { href: "/map", key: "nav.map" },
+  { href: "/providers", key: "nav.providers" },
+  { href: "/awards", key: "nav.awards" },
+  { href: "/travel", key: "nav.travel" },
+  { href: "/offline", key: "nav.offline" },
+  { href: "/about", key: "nav.about" },
+];
+
+/** The supplied logo artwork (cream ground). On dark themes it sits on a cream badge. */
+export function BrandLogo({ className, height = 52 }: { className?: string; height?: number }) {
+  const width = Math.round((height * 1280) / 853);
+  return (
+    <span className={cn("brand-badge", className)}>
+      <Image src="/brand/visit-tigray-logo-520.webp" alt="Visit Tigray" width={width} height={height} priority unoptimized className="h-auto" style={{ height, width: "auto" }} />
+    </span>
+  );
+}
+
+function MoreMenu() {
+  const { locale, t } = useI18n();
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  return (
+    <li className="relative">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls="nav-more"
+        onClick={() => setOpen((o) => !o)}
+        onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
+        className="rounded-full px-3 py-2 text-[0.92rem] hover:bg-surface-2"
+      >
+        {t("nav.more")} <span aria-hidden="true">▾</span>
+      </button>
+      {open && (
+        <ul id="nav-more" className="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-line bg-surface p-2 shadow-[var(--shadow)]" onKeyDown={(e) => e.key === "Escape" && setOpen(false)}>
+          {MORE.map((n) => (
+            <li key={n.href}>
+              <Link
+                href={`/${locale}${n.href}`}
+                onClick={() => setOpen(false)}
+                aria-current={pathname.startsWith(`/${locale}${n.href}`) ? "page" : undefined}
+                className="block rounded-lg px-3 py-2 text-sm hover:bg-surface-2"
+              >
+                {t(n.key)}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+}
 
 export function LanguageSwitcher() {
   const { locale, t } = useI18n();
@@ -99,13 +154,10 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur supports-[backdrop-filter]:bg-bg/75">
-      <div className="mx-auto flex h-[72px] max-w-7xl items-center gap-4 px-5 sm:px-8">
-        <Link href={`/${locale}`} className="flex items-center gap-3" aria-label={t("brand.home")}>
-          <Emblem className="h-9 w-9 text-forest" />
-          <span className="leading-none">
-            <span className="block font-display text-xl tracking-wide">{t("brand.name")}</span>
-            <span className="block text-[0.68rem] uppercase tracking-[0.2em] text-muted">{t("brand.tagline")}</span>
-          </span>
+      <div className="mx-auto flex h-[76px] max-w-7xl items-center gap-3 px-5 sm:px-8">
+        <Link href={`/${locale}`} className="flex shrink-0 items-center" aria-label={t("brand.home")}>
+          <BrandLogo height={50} className="hidden sm:inline-flex" />
+          <BrandLogo height={38} className="sm:hidden" />
         </Link>
         <nav aria-label={t("nav.primary")} className="ml-auto hidden lg:block">
           <ul className="flex items-center gap-1">
@@ -124,6 +176,7 @@ export function Header() {
                 </li>
               );
             })}
+            <MoreMenu />
           </ul>
         </nav>
         <div className="ml-auto hidden items-center gap-2 lg:ml-2 lg:flex">
@@ -131,6 +184,7 @@ export function Header() {
           <ThemeToggle />
           {me ? (
             <>
+              <NotificationBell />
               {isStaff && (
                 <Link href={`/${locale}/bureau`} className="rounded-full px-3 py-2 text-sm hover:bg-surface-2">
                   {t("nav.bureau")}
@@ -146,9 +200,14 @@ export function Header() {
             </Link>
           )}
         </div>
+        {me && (
+          <span className="ml-auto lg:hidden">
+            <NotificationBell />
+          </span>
+        )}
         <button
           type="button"
-          className="ml-auto min-h-[44px] rounded-full border border-line px-4 py-2 text-sm lg:hidden"
+          className={cn("min-h-[44px] rounded-full border border-line px-4 py-2 text-sm lg:hidden", !me && "ml-auto")}
           aria-expanded={open}
           aria-controls="mobile-menu"
           onClick={() => setOpen((o) => !o)}
@@ -160,7 +219,7 @@ export function Header() {
         <div id="mobile-menu" className="border-t border-line bg-bg px-5 pb-6 lg:hidden">
           <nav aria-label={t("nav.primary")}>
             <ul className="flex flex-col py-3">
-              {[...NAV, { href: "/awards", key: "nav.awards" as MsgKey }, { href: "/travel", key: "nav.travel" as MsgKey }, { href: "/offline", key: "nav.offline" as MsgKey }].map((n) => (
+              {[...NAV, ...MORE].map((n) => (
                 <li key={n.href}>
                   <Link href={`/${locale}${n.href}`} className="block rounded-lg px-2 py-3 text-lg">
                     {t(n.key)}

@@ -1,12 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Alert, Loading, cn } from "@/components/ui";
 import { MfaSetup } from "@/components/site/account";
 import { LanguageSwitcher, ThemeToggle } from "@/components/site/header";
-import { Emblem } from "@/components/site/illustrations";
 import { useI18n, useSession } from "@/components/site/providers";
 import { api } from "@/lib/api";
 import type { MsgKey } from "@/lib/i18n";
@@ -88,7 +88,9 @@ export function BureauShell({ children }: { children: ReactNode }) {
       </a>
       <aside className="border-b border-line bg-surface lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:border-b-0 lg:border-r">
         <div className="flex items-center gap-3 px-5 py-5">
-          <Emblem className="h-8 w-8 text-forest" />
+          <span className="brand-badge flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-line bg-[#f8f2e9]">
+            <Image src="/brand/emblem-256.webp" alt="" width={44} height={44} unoptimized />
+          </span>
           <div>
             <p className="font-display text-lg leading-none">{t("brand.name")}</p>
             <p className="text-[0.68rem] uppercase tracking-[0.18em] text-muted">{t("bureau.title")}</p>
