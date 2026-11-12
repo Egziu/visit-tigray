@@ -8,7 +8,10 @@ FROM node:22-alpine AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY web/ ./
-ENV NEXT_TELEMETRY_DISABLED=1
+# The /api rewrite target is resolved at build time (docs/FRONTEND.md).
+ARG API_ORIGIN=http://api:8000
+ARG NEXT_PUBLIC_MAP_STYLE_URL=
+ENV API_ORIGIN=$API_ORIGIN NEXT_PUBLIC_MAP_STYLE_URL=$NEXT_PUBLIC_MAP_STYLE_URL NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 FROM node:22-alpine
