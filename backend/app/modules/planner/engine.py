@@ -231,3 +231,79 @@ def annotate_manual(db: Session, day_slugs: list[list[str]], locale: str) -> dic
     return {"mode": "operational", "notice": NOTICE["operational"], "days": days, "excluded": [],
             "virtual_alternatives": [], "generated_at": utcnow().isoformat(), "edited": True,
             "weather": "not_considered", "costs": "unknown — no verified price data"}
+
+
+# ---------------------------------------------------------------------------------------------
+# Enrichment: summary, pre-travel checklist and per-stop alternatives (all deterministic).
+
+def enrich_plan(db: Session, plan: dict, locale: str, interests: list[str] | None = None) -> dict:
+    if plan.get("mode") != "operational":
+        plan.setdefault("checklist", [{"kind": "advisory", "text": plan.get("notice", ""), "slugs": []}])
+        plan.setdefault("summary", {"stop_count": 0, "days": 0, "known_minutes": 0, "verified_legs": 0, "unverified_legs": 0})
+        return plan
+    locale = norm_locale(locale)
+    wanted = {i.lower() for i in (interests or [])}
+    stops = [s for d in plan["days"] for s in d["stops"]]
+    in_plan = {s["slug"] for s in stops}
+    advisories = active_advisories(db)
+    pool = []
+    for d in db.execute(select(Destination).where(Destination.published_snapshot.is_not(None))).scalars():
+        level, _ = advisory_level_for(advisories, d.id)
+        if d.slug in in_plan or level in BLOCKING:
+            continue
+        v = localize_snapshot(d.published_snapshot or {}, locale)
+        tags = {t.lower() for t in [*(v.get("interests") or []), (v.get("category") or {}).get("slug", "")] if t}
+        pool.append((d, v, tags))
+    by_slug = {d.slug: d for d in db.execute(select(Destination).where(Destination.slug.in_(in_plan))).scalars()}
+    for s in stops:
+        here = by_slug.get(s["slug"])
+        here_ll = latlng(here.location) if here is not None and here.location is not None else None
+
+        def rank(item, here_ll=here_ll):
+            d, _v, tags = item
+            there = latlng(d.location) if d.location is not None else None
+            dist = haversine_km(here_ll, there) if here_ll and there else 1e6
+            return (-len(wanted & tags), dist)
+
+        alts = []
+        for d, v, tags in sorted(pool, key=rank)[:2]:
+            parts = []
+            if wanted & tags:
+                parts.append("Also matches: " + ", ".join(sorted(wanted & tags)))
+            there = latlng(d.location) if d.location is not None else None
+            if here_ll and there:
+                parts.append(f"≈{round(haversine_km(here_ll, there), 1)} km straight-line from {s['name']}")
+            alts.append({"slug": d.slug, "name": v["name"], "reason": " · ".join(parts) or "Another published destination"})
+        s["alternatives"] = alts
+
+    checklist: list[dict] = []
+
+    def add(kind: str, text: str, slugs: list[str]) -> None:
+        if slugs:
+            checklist.append({"kind": kind, "text": text, "slugs": slugs})
+
+    names = {s["slug"]: s["name"] for s in stops}
+    permit_yes = [s["slug"] for s in stops if s.get("permit_required") == "yes"]
+    permit_unknown = [s["slug"] for s in stops if s.get("permit_required") not in ("yes", "no")]
+    add("permit", "Arrange permission in advance for: " + ", ".join(names[x] for x in permit_yes), permit_yes)
+    add("permit", "Permit requirements are unknown — confirm with the Tourism Bureau or custodians for: "
+        + ", ".join(names[x] for x in permit_unknown), permit_unknown)
+    caution = [s["slug"] for s in stops if s.get("advisory_level") == "caution"]
+    add("advisory", "Official caution advisories apply to: " + ", ".join(names[x] for x in caution), caution)
+    acc_unknown = [s["slug"] for s in stops if (s.get("accessibility") or {}).get("step_free", "unknown") == "unknown"]
+    add("accessibility", "Accessibility information is unknown for: " + ", ".join(names[x] for x in acc_unknown), acc_unknown)
+    stale = [s["slug"] for s in stops if s.get("is_stale")]
+    add("verification", "Not verified by the Bureau within the last year — check current conditions for: "
+        + ", ".join(names[x] for x in stale), stale)
+    dur_unknown = [s["slug"] for s in stops if s.get("visit_duration_minutes") is None]
+    add("duration", "Visit durations are unknown for: " + ", ".join(names[x] for x in dur_unknown), dur_unknown)
+    legs = [s for s in stops if s.get("travel_from_previous")]
+    unverified = [s["slug"] for s in legs if not s["travel_from_previous"].get("verified")]
+    add("travel", "Road distance and travel time are unverified for the legs to: " + ", ".join(names[x] for x in unverified),
+        unverified)
+    plan["checklist"] = checklist
+    plan["summary"] = {"stop_count": len(stops), "days": len(plan["days"]),
+                       "known_minutes": sum((s.get("visit_duration_minutes") or 0) for s in stops)
+                       + sum((s["travel_from_previous"].get("duration_minutes") or 0) for s in legs),
+                       "verified_legs": len(legs) - len(unverified), "unverified_legs": len(unverified)}
+    return plan

@@ -5,7 +5,7 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.config import AIMode
@@ -14,7 +14,7 @@ from app.core.errors import AppError, not_found
 from app.core.i18n import norm_locale
 from app.core.security import rate_limit
 from app.modules.audit import service as audit
-from app.modules.identity.deps import optional_principal, require
+from app.modules.identity.deps import current_principal, optional_principal, require
 from app.modules.identity.service import Principal
 from app.modules.platform.service import get_setting, require_flag, set_setting
 from app.modules.tie import evaluation, guide
@@ -60,10 +60,31 @@ def ask(body: AskIn, db: Session = Depends(get_db), p: Principal | None = Depend
     require_flag(db, "ai_guide")
     ans = guide.ask(db, question=body.question, locale=body.locale, persona=body.persona, principal=p,
                     conversation_id=body.conversation_id, destination_slug=body.destination_slug)
+    out = ans.as_dict()
+    out["actions"] = guide.actions_for(db, body.question, out, body.locale, body.destination_slug)
     from app.modules.analytics.router import track
     track(db, "guide_question", destination_slug=body.destination_slug, locale=body.locale)
     db.commit()
-    return ans.as_dict()
+    return out
+
+
+@router.get("/suggestions")
+def suggestions(locale: str = "en", destination: str | None = None, db: Session = Depends(get_db)):
+    return guide.suggestions(db, locale, destination)
+
+
+@router.get("/conversations")
+def my_conversations(p: Principal = Depends(current_principal), db: Session = Depends(get_db)):
+    convs = db.execute(select(Conversation).where(Conversation.owner_id == p.id)
+                       .order_by(Conversation.updated_at.desc()).limit(50)).scalars().all()
+    out = []
+    for c in convs:
+        first = db.execute(select(Message.content).where(Message.conversation_id == c.id, Message.role == "user")
+                           .order_by(Message.created_at).limit(1)).scalar()
+        count = db.execute(select(func.count()).select_from(Message).where(Message.conversation_id == c.id)).scalar()
+        out.append({"id": str(c.id), "title": (first or "Conversation")[:80], "persona": c.persona, "locale": c.locale,
+                    "updated_at": c.updated_at.isoformat(), "message_count": count})
+    return out
 
 
 class FeedbackIn(BaseModel):

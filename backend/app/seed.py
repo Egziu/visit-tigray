@@ -158,6 +158,43 @@ def seed_knowledge(db: Session, corpus: Path = CORPUS) -> int:
     return count
 
 
+SPACES = [
+    ("travellers-lounge", {"en": "Travellers' Lounge", "ti": "መዕረፊ በጻሕቲ", "am": "የተጓዦች ማረፊያ"},
+     {"en": "Meet fellow travellers, share tips and plan together.", "ti": "ምስ ካልኦት በጻሕቲ ተራኸቡ።", "am": "ከሌሎች ተጓዦች ጋር ይገናኙ።"}, "🌄",
+     [("welcome", {"en": "welcome", "ti": "እንቋዕ ብደሓን መጻእኩም", "am": "እንኳን ደህና መጡ"}, "announcements", 0),
+      ("general", {"en": "general", "ti": "ሓፈሻዊ", "am": "አጠቃላይ"}, "text", 0),
+      ("trip-planning", {"en": "trip-planning", "ti": "መደብ-ጉዕዞ", "am": "የጉዞ-እቅድ"}, "text", 0),
+      ("photography", {"en": "photography", "ti": "ስእሊ", "am": "ፎቶግራፍ"}, "text", 0)]),
+    ("heritage-history", {"en": "Heritage & History", "ti": "ቅርስን ታሪኽን", "am": "ቅርስና ታሪክ"},
+     {"en": "Respectful, sourced conversation about Tigray's heritage.", "ti": "ብዛዕባ ቅርሲ ትግራይ ብኽብሪ ዝግበር ዘተ።",
+      "am": "ስለ ትግራይ ቅርስ በአክብሮት የሚደረግ ውይይት።"}, "🏛",
+     [("aksum", {"en": "aksum", "ti": "ኣክሱም", "am": "አክሱም"}, "text", 30),
+      ("rock-churches", {"en": "rock-churches", "ti": "ኣብያተ-ክርስቲያናት", "am": "አብያተ-ክርስቲያናት"}, "text", 30),
+      ("festivals", {"en": "festivals", "ti": "በዓላት", "am": "በዓላት"}, "text", 0)]),
+    ("diaspora-connect", {"en": "Diaspora Connect", "ti": "ርክብ ዲያስፖራ", "am": "የዲያስፖራ ግንኙነት"},
+     {"en": "Roots, language and memories across generations.", "ti": "ሱር፡ ቋንቋን ዝኽሪን።", "am": "ሥር፣ ቋንቋና ትዝታ።"}, "🤝",
+     [("stories", {"en": "stories", "ti": "ዛንታታት", "am": "ታሪኮች"}, "text", 0),
+      ("learn-tigrinya", {"en": "learn-tigrinya", "ti": "ትግርኛ-ምምሃር", "am": "ትግርኛ-መማር"}, "text", 0)]),
+]
+
+
+def seed_spaces(db: Session) -> int:
+    from app.modules.social.models import Channel, Space
+
+    n = 0
+    for i, (slug, name, desc, icon, channels) in enumerate(SPACES):
+        if db.execute(select(Space).where(Space.slug == slug)).first():
+            continue
+        s = Space(slug=slug, name_i18n=name, description_i18n=desc, icon=icon, sort_order=i * 10)
+        db.add(s)
+        db.flush()
+        for j, (cslug, cname, kind, slow) in enumerate(channels):
+            db.add(Channel(space_id=s.id, slug=cslug, name_i18n=cname, kind=kind, slow_mode_seconds=slow, sort_order=j * 10))
+        n += 1
+    db.flush()
+    return n
+
+
 def run(dev_admin: str | None = None, allow_staging: bool = False) -> None:  # pragma: no cover - CLI
     s = get_settings()
     if s.environment == "production" or (not s.is_dev and not (allow_staging and s.environment == "staging")):
@@ -166,6 +203,7 @@ def run(dev_admin: str | None = None, allow_staging: bool = False) -> None:  # p
     db = session_factory()()
     idsvc.sync_rbac_catalog(db)
     seed_content(db)
+    seed_spaces(db)
     n = seed_knowledge(db)
     if dev_admin:
         pw = secrets.token_urlsafe(14)

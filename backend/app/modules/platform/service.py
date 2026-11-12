@@ -142,6 +142,7 @@ TEMPLATES = {
     "moderation_decision": ("Your story review result", "Your submission \"{title}\" was {decision}. {note}"),
     "provider_inquiry": ("New visitor inquiry", "You have a new inquiry on Visit Tigray. Sign in to read and reply."),
     "report": ("Visit Tigray report", "{body}"),
+    "journal_new_post": ("New story: {title}", "{publication} published a new story on Visit Tigray: {title}\n{link}\n\nYou receive this because you subscribed with email updates. Manage subscriptions in your account."),
 }
 
 
@@ -152,6 +153,7 @@ def _send_notification(db: Session, payload: dict) -> None:
         return
     subject, body_t = TEMPLATES.get(n.template, ("Visit Tigray", "{body}"))
     body = body_t.format_map(_SafeDict(n.payload))
+    subject = subject.format_map(_SafeDict(n.payload))[:200]
     s = get_settings()
     if n.channel == "email":
         if not s.smtp_host:

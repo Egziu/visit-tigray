@@ -536,6 +536,8 @@ def queue(_=Depends(require("community.moderate")), db: Session = Depends(get_db
     appeals = [{"id": str(a.id), "target_kind": a.target_kind, "target_id": a.target_id, "statement": a.statement,
                 "created_at": a.created_at.isoformat()}
                for a in db.execute(select(Appeal).where(Appeal.status == "open")).scalars()]
+    from app.modules.social.router import queue_items
+    items += queue_items(db)
     return {"items": items, "reports": reports, "appeals": appeals,
             "notice": "AI flags are advisory signals only. Decisions are made by moderators."}
 
@@ -546,10 +548,29 @@ class DecisionIn(BaseModel):
 
 
 @router.post("/bureau/moderation/{kind}/{ident}/decision")
-def decide(kind: Literal["memory", "comment"], ident: uuid.UUID, body: DecisionIn, request: Request,
-           p: Principal = Depends(require("community.moderate")), db: Session = Depends(get_db)):
+def decide(kind: Literal["memory", "comment", "journal_post", "journal_comment", "space_message"], ident: str,
+           body: DecisionIn, request: Request, p: Principal = Depends(require("community.moderate")),
+           db: Session = Depends(get_db)):
+    if kind in ("journal_post", "journal_comment", "space_message"):
+        from app.modules.social.router import decide as social_decide
+        try:
+            social_decide(db, kind, ident, body.decision, body.note, p)
+        except ValueError as exc:
+            raise not_found("Item") from exc
+        for r in db.execute(select(Report).where(Report.target_kind == kind, Report.target_id == ident,
+                                                 Report.status == "open")).scalars():
+            r.status = "actioned" if body.decision in ("reject", "remove") else "dismissed"
+            r.resolved_by = p.id
+        audit.record(db, action=f"moderation.{body.decision}", resource_type=kind, resource_id=ident, actor=p,
+                     request=request, changes={"note": body.note})
+        db.commit()
+        return {"status": "ok"}
+    try:
+        ident_uuid = uuid.UUID(ident)
+    except ValueError as exc:
+        raise not_found("Item") from exc
     if kind == "memory":
-        m = db.get(Memory, ident)
+        m = db.get(Memory, ident_uuid)
         if m is None:
             raise not_found("Story")
         if m.author_id == p.id:
@@ -576,7 +597,7 @@ def decide(kind: Literal["memory", "comment"], ident: uuid.UUID, body: DecisionI
                                                            "remove": "removed"}[body.decision],
                             "note": body.note or "You can appeal this decision from your account."})
     else:
-        c = db.get(Comment, ident)
+        c = db.get(Comment, ident_uuid)
         if c is None:
             raise not_found("Comment")
         c.status = "visible" if body.decision in ("approve", "restore") else "removed"
@@ -584,7 +605,7 @@ def decide(kind: Literal["memory", "comment"], ident: uuid.UUID, body: DecisionI
                                              Report.status == "open")).scalars():
         r.status = "actioned" if body.decision in ("reject", "remove") else "dismissed"
         r.resolved_by = p.id
-    audit.record(db, action=f"moderation.{body.decision}", resource_type=kind, resource_id=ident, actor=p,
+    audit.record(db, action=f"moderation.{body.decision}", resource_type=kind, resource_id=ident_uuid, actor=p,
                  request=request, changes={"note": body.note})
     db.commit()
     return {"status": "ok"}

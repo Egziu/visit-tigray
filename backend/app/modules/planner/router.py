@@ -20,7 +20,7 @@ from app.core.ethiopic import is_ethiopic, transliterate
 from app.core.security import rate_limit
 from app.modules.identity.deps import current_principal
 from app.modules.identity.service import Principal
-from app.modules.planner.engine import PlanRequest, annotate_manual, build_plan
+from app.modules.planner.engine import PlanRequest, annotate_manual, build_plan, enrich_plan
 from app.modules.planner.models import Itinerary, ItineraryVersion
 
 router = APIRouter(prefix="/api", tags=["planner"])
@@ -50,10 +50,24 @@ def _req(body: PlanIn) -> PlanRequest:
 @router.post("/planner/plan", dependencies=[Depends(rate_limit("default"))])
 def plan(body: PlanIn, db: Session = Depends(get_db)):
     from app.modules.analytics.router import track
-    out = build_plan(db, _req(body))
+    out = enrich_plan(db, build_plan(db, _req(body)), body.locale, body.interests)
     track(db, "plan_created", locale=body.locale)
     db.commit()
     return out
+
+
+class AnnotateIn(BaseModel):
+    days: list[list[str]] = Field(min_length=1, max_length=14)
+    locale: Literal["en", "ti", "am"] = "en"
+    interests: list[str] = Field(default_factory=list, max_length=10)
+
+
+@router.post("/planner/annotate", dependencies=[Depends(rate_limit("default"))])
+def annotate(body: AnnotateIn, db: Session = Depends(get_db)):
+    """Re-validate an edited (unsaved) plan: drag-and-drop, swaps and removals are checked server-side."""
+    if sum(len(d) for d in body.days) > 60:
+        raise AppError(422, "too_many_stops", "At most 60 stops per itinerary.")
+    return enrich_plan(db, annotate_manual(db, body.days, body.locale), body.locale, body.interests)
 
 
 # ---------------------------------------------------------------- saved itineraries
@@ -95,7 +109,7 @@ def _out(db: Session, it: Itinerary) -> dict:
 @router.post("/itineraries", status_code=201)
 def save(body: SaveIn, p: Principal = Depends(current_principal), db: Session = Depends(get_db)):
     # The plan is regenerated server-side: clients cannot store arbitrary "verified" facts.
-    plan_doc = build_plan(db, _req(body.request))
+    plan_doc = enrich_plan(db, build_plan(db, _req(body.request)), body.request.locale, body.request.interests)
     if plan_doc["mode"] != "operational":
         raise AppError(409, "travel_not_advised", "Operational itineraries are disabled by an official advisory.")
     it = Itinerary(owner_id=p.id, title=body.title, start_date=body.start_date.isoformat() if body.start_date else None)
@@ -129,7 +143,7 @@ def versions(ident: uuid.UUID, p: Principal = Depends(current_principal), db: Se
 @router.put("/itineraries/{ident}")
 def edit(ident: uuid.UUID, body: EditIn, p: Principal = Depends(current_principal), db: Session = Depends(get_db)):
     it = _own(db, ident, p)
-    plan_doc = annotate_manual(db, body.days, body.locale)
+    plan_doc = enrich_plan(db, annotate_manual(db, body.days, body.locale), body.locale)
     it.current_version += 1
     if body.title:
         it.title = body.title

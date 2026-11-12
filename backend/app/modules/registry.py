@@ -8,7 +8,7 @@ import importlib
 
 MODULES = [
     "identity", "audit", "platform", "content", "media", "knowledge", "tie", "planner",
-    "community", "providers", "awards", "analytics", "assistant",
+    "community", "providers", "awards", "analytics", "assistant", "social",
 ]
 
 

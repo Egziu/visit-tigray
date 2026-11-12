@@ -4,3 +4,4 @@ REVOKE UPDATE, DELETE, TRUNCATE ON audit_events FROM vt_app;
 GRANT SELECT, INSERT ON audit_events TO vt_app;
 REVOKE ALL ON alembic_version FROM vt_app;
 GRANT SELECT ON alembic_version TO vt_app;
+GRANT USAGE, SELECT ON SEQUENCE space_message_update_seq TO vt_app;

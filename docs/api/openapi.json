@@ -3216,6 +3216,82 @@
     }
    }
   },
+  "/api/tie/suggestions": {
+   "get": {
+    "tags": [
+     "tie"
+    ],
+    "summary": "Suggestions",
+    "operationId": "suggestions_api_tie_suggestions_get",
+    "parameters": [
+     {
+      "name": "locale",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "en",
+       "title": "Locale"
+      }
+     },
+     {
+      "name": "destination",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Destination"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/tie/conversations": {
+   "get": {
+    "tags": [
+     "tie"
+    ],
+    "summary": "My Conversations",
+    "operationId": "my_conversations_api_tie_conversations_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   }
+  },
   "/api/tie/feedback": {
    "post": {
     "tags": [
@@ -3519,6 +3595,46 @@
     }
    }
   },
+  "/api/planner/annotate": {
+   "post": {
+    "tags": [
+     "planner"
+    ],
+    "summary": "Annotate",
+    "description": "Re-validate an edited (unsaved) plan: drag-and-drop, swaps and removals are checked server-side.",
+    "operationId": "annotate_api_planner_annotate_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AnnotateIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/api/itineraries": {
    "get": {
     "tags": [
@@ -3638,7 +3754,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/EditIn"
+        "$ref": "#/components/schemas/app__modules__planner__router__EditIn"
        }
       }
      }
@@ -4292,7 +4408,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/CommentIn"
+        "$ref": "#/components/schemas/app__modules__community__router__CommentIn"
        }
       }
      }
@@ -4823,7 +4939,10 @@
       "schema": {
        "enum": [
         "memory",
-        "comment"
+        "comment",
+        "journal_post",
+        "journal_comment",
+        "space_message"
        ],
        "type": "string",
        "title": "Kind"
@@ -4835,7 +4954,6 @@
       "required": true,
       "schema": {
        "type": "string",
-       "format": "uuid",
        "title": "Ident"
       }
      }
@@ -6785,6 +6903,1411 @@
      }
     }
    }
+  },
+  "/api/journal": {
+   "get": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Journal Feed",
+    "operationId": "journal_feed_api_journal_get",
+    "parameters": [
+     {
+      "name": "feed",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "enum": [
+        "latest",
+        "following",
+        "featured"
+       ],
+       "type": "string",
+       "default": "latest",
+       "title": "Feed"
+      }
+     },
+     {
+      "name": "destination",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Destination"
+      }
+     },
+     {
+      "name": "tag",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Tag"
+      }
+     },
+     {
+      "name": "cursor",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Cursor"
+      }
+     },
+     {
+      "name": "locale",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "en",
+       "title": "Locale"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 50,
+       "minimum": 1,
+       "default": 20,
+       "title": "Limit"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Create Post",
+    "operationId": "create_post_api_journal_post",
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PostIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/journal/{ident}": {
+   "get": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Journal Post",
+    "operationId": "journal_post_api_journal__ident__get",
+    "parameters": [
+     {
+      "name": "ident",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Ident"
+      }
+     },
+     {
+      "name": "locale",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "en",
+       "title": "Locale"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "put": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Edit Post",
+    "operationId": "edit_post_api_journal__ident__put",
+    "parameters": [
+     {
+      "name": "ident",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Ident"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PostIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Delete Post",
+    "operationId": "delete_post_api_journal__ident__delete",
+    "parameters": [
+     {
+      "name": "ident",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Ident"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/me/journal": {
+   "get": {
+    "tags": [
+     "social"
+    ],
+    "summary": "My Posts",
+    "operationId": "my_posts_api_me_journal_get",
+    "parameters": [
+     {
+      "name": "locale",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "en",
+       "title": "Locale"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/journal/{ident}/like": {
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Like",
+    "operationId": "like_api_journal__ident__like_post",
+    "parameters": [
+     {
+      "name": "ident",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Ident"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/journal/{ident}/comments": {
+   "get": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Post Comments",
+    "operationId": "post_comments_api_journal__ident__comments_get",
+    "parameters": [
+     {
+      "name": "ident",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Ident"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Add Comment",
+    "operationId": "add_comment_api_journal__ident__comments_post",
+    "parameters": [
+     {
+      "name": "ident",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Ident"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__social__router__CommentIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/journal-comments/{ident}": {
+   "delete": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Delete Comment",
+    "operationId": "delete_comment_api_journal_comments__ident__delete",
+    "parameters": [
+     {
+      "name": "ident",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Ident"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/journal/{ident}/report": {
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Report Post",
+    "operationId": "report_post_api_journal__ident__report_post",
+    "parameters": [
+     {
+      "name": "ident",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Ident"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReportIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/publications/{handle}": {
+   "get": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Publication",
+    "operationId": "publication_api_publications__handle__get",
+    "parameters": [
+     {
+      "name": "handle",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Handle"
+      }
+     },
+     {
+      "name": "locale",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "en",
+       "title": "Locale"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/me/publication": {
+   "put": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Update Publication",
+    "operationId": "update_publication_api_me_publication_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PublicationIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/publications/{handle}/subscribe": {
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Subscribe",
+    "operationId": "subscribe_api_publications__handle__subscribe_post",
+    "parameters": [
+     {
+      "name": "handle",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Handle"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SubscribeIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/me/notifications": {
+   "get": {
+    "tags": [
+     "social"
+    ],
+    "summary": "My Notifications",
+    "operationId": "my_notifications_api_me_notifications_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/me/notifications/read": {
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Mark Read",
+    "operationId": "mark_read_api_me_notifications_read_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReadIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/spaces": {
+   "get": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Spaces",
+    "operationId": "spaces_api_spaces_get",
+    "parameters": [
+     {
+      "name": "locale",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "en",
+       "title": "Locale"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/spaces/{slug}/join": {
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Join",
+    "operationId": "join_api_spaces__slug__join_post",
+    "parameters": [
+     {
+      "name": "slug",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Slug"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/spaces/{slug}/leave": {
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Leave",
+    "operationId": "leave_api_spaces__slug__leave_post",
+    "parameters": [
+     {
+      "name": "slug",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Slug"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/spaces/{slug}/channels/{channel}/messages": {
+   "get": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Messages",
+    "operationId": "messages_api_spaces__slug__channels__channel__messages_get",
+    "parameters": [
+     {
+      "name": "slug",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Slug"
+      }
+     },
+     {
+      "name": "channel",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Channel"
+      }
+     },
+     {
+      "name": "before",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Before"
+      }
+     },
+     {
+      "name": "after",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "After"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 100,
+       "minimum": 1,
+       "default": 50,
+       "title": "Limit"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Post Message",
+    "operationId": "post_message_api_spaces__slug__channels__channel__messages_post",
+    "parameters": [
+     {
+      "name": "slug",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Slug"
+      }
+     },
+     {
+      "name": "channel",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Channel"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MessageIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/space-messages/{ident}": {
+   "patch": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Edit Message",
+    "operationId": "edit_message_api_space_messages__ident__patch",
+    "parameters": [
+     {
+      "name": "ident",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Ident"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__social__router__EditIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Delete Message",
+    "operationId": "delete_message_api_space_messages__ident__delete",
+    "parameters": [
+     {
+      "name": "ident",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Ident"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/space-messages/{ident}/reactions": {
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "React",
+    "operationId": "react_api_space_messages__ident__reactions_post",
+    "parameters": [
+     {
+      "name": "ident",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Ident"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReactionIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/space-messages/{ident}/report": {
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Report Message",
+    "operationId": "report_message_api_space_messages__ident__report_post",
+    "parameters": [
+     {
+      "name": "ident",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Ident"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReportIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/spaces/{slug}/channels/{channel}/stream": {
+   "get": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Stream",
+    "description": "Server-Sent Events. Works through the Next.js /api proxy with same-origin cookies and across\nseveral API workers (state is read from PostgreSQL, not process memory).",
+    "operationId": "stream_api_spaces__slug__channels__channel__stream_get",
+    "parameters": [
+     {
+      "name": "slug",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Slug"
+      }
+     },
+     {
+      "name": "channel",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Channel"
+      }
+     },
+     {
+      "name": "after",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "default": 0,
+       "title": "After"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/bureau/spaces": {
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Create Space",
+    "operationId": "create_space_api_bureau_spaces_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SpaceIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/bureau/spaces/{slug}/channels/{channel}": {
+   "put": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Channel Settings",
+    "operationId": "channel_settings_api_bureau_spaces__slug__channels__channel__put",
+    "parameters": [
+     {
+      "name": "slug",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Slug"
+      }
+     },
+     {
+      "name": "channel",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Channel"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ChannelSettingsIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/bureau/spaces/{slug}/members": {
+   "post": {
+    "tags": [
+     "social"
+    ],
+    "summary": "Set Member",
+    "operationId": "set_member_api_bureau_spaces__slug__members_post",
+    "parameters": [
+     {
+      "name": "slug",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Slug"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MemberRoleIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
   }
  },
  "components": {
@@ -6983,6 +8506,45 @@
     ],
     "title": "AliasIn"
    },
+   "AnnotateIn": {
+    "properties": {
+     "days": {
+      "items": {
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "type": "array",
+      "maxItems": 14,
+      "minItems": 1,
+      "title": "Days"
+     },
+     "locale": {
+      "type": "string",
+      "enum": [
+       "en",
+       "ti",
+       "am"
+      ],
+      "title": "Locale",
+      "default": "en"
+     },
+     "interests": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "maxItems": 10,
+      "title": "Interests"
+     }
+    },
+    "type": "object",
+    "required": [
+     "days"
+    ],
+    "title": "AnnotateIn"
+   },
    "AppealDecisionIn": {
     "properties": {
      "decision": {
@@ -7061,6 +8623,62 @@
      "note"
     ],
     "title": "ApproveIn"
+   },
+   "Block_": {
+    "properties": {
+     "type": {
+      "type": "string",
+      "enum": [
+       "paragraph",
+       "heading",
+       "quote",
+       "image",
+       "divider"
+      ],
+      "title": "Type"
+     },
+     "text": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 8000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Text"
+     },
+     "media_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Media Id"
+     },
+     "caption": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 300
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Caption"
+     }
+    },
+    "type": "object",
+    "required": [
+     "type"
+    ],
+    "title": "Block_"
    },
    "Body_upload_api_bureau_knowledge_documents_post": {
     "properties": {
@@ -7249,6 +8867,85 @@
     ],
     "title": "Body_upload_api_media_post"
    },
+   "ChannelIn": {
+    "properties": {
+     "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,58}$",
+      "title": "Slug"
+     },
+     "name_i18n": {
+      "additionalProperties": {
+       "type": "string"
+      },
+      "propertyNames": {
+       "enum": [
+        "en",
+        "ti",
+        "am"
+       ]
+      },
+      "type": "object",
+      "title": "Name I18N"
+     },
+     "topic_i18n": {
+      "additionalProperties": {
+       "type": "string"
+      },
+      "propertyNames": {
+       "enum": [
+        "en",
+        "ti",
+        "am"
+       ]
+      },
+      "type": "object",
+      "title": "Topic I18N"
+     },
+     "kind": {
+      "type": "string",
+      "enum": [
+       "text",
+       "announcements"
+      ],
+      "title": "Kind",
+      "default": "text"
+     },
+     "slow_mode_seconds": {
+      "type": "integer",
+      "maximum": 3600.0,
+      "minimum": 0.0,
+      "title": "Slow Mode Seconds",
+      "default": 0
+     },
+     "sort_order": {
+      "type": "integer",
+      "title": "Sort Order",
+      "default": 100
+     }
+    },
+    "type": "object",
+    "required": [
+     "slug",
+     "name_i18n"
+    ],
+    "title": "ChannelIn"
+   },
+   "ChannelSettingsIn": {
+    "properties": {
+     "slow_mode_seconds": {
+      "type": "integer",
+      "maximum": 3600.0,
+      "minimum": 0.0,
+      "title": "Slow Mode Seconds"
+     }
+    },
+    "type": "object",
+    "required": [
+     "slow_mode_seconds"
+    ],
+    "title": "ChannelSettingsIn"
+   },
    "CodeIn": {
     "properties": {
      "code": {
@@ -7286,21 +8983,6 @@
      "statement"
     ],
     "title": "CoiIn"
-   },
-   "CommentIn": {
-    "properties": {
-     "body": {
-      "type": "string",
-      "maxLength": 1500,
-      "minLength": 2,
-      "title": "Body"
-     }
-    },
-    "type": "object",
-    "required": [
-     "body"
-    ],
-    "title": "CommentIn"
    },
    "CompetitionIn": {
     "properties": {
@@ -7728,67 +9410,6 @@
     },
     "type": "object",
     "title": "DestinationPatch"
-   },
-   "EditIn": {
-    "properties": {
-     "title": {
-      "anyOf": [
-       {
-        "type": "string",
-        "maxLength": 160,
-        "minLength": 2
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Title"
-     },
-     "days": {
-      "items": {
-       "items": {
-        "type": "string"
-       },
-       "type": "array"
-      },
-      "type": "array",
-      "maxItems": 14,
-      "title": "Days"
-     },
-     "locale": {
-      "type": "string",
-      "enum": [
-       "en",
-       "ti",
-       "am"
-      ],
-      "title": "Locale",
-      "default": "en"
-     },
-     "start_date": {
-      "anyOf": [
-       {
-        "type": "string",
-        "format": "date"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Start Date"
-     },
-     "note": {
-      "type": "string",
-      "maxLength": 300,
-      "title": "Note",
-      "default": ""
-     }
-    },
-    "type": "object",
-    "required": [
-     "days"
-    ],
-    "title": "EditIn"
    },
    "EmailIn": {
     "properties": {
@@ -8280,6 +9901,47 @@
     ],
     "title": "MeasurementIn"
    },
+   "MemberRoleIn": {
+    "properties": {
+     "handle": {
+      "type": "string",
+      "title": "Handle"
+     },
+     "role": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "member",
+         "moderator"
+        ]
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Role"
+     },
+     "restrict_hours": {
+      "anyOf": [
+       {
+        "type": "integer",
+        "maximum": 720.0,
+        "minimum": 0.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Restrict Hours"
+     }
+    },
+    "type": "object",
+    "required": [
+     "handle"
+    ],
+    "title": "MemberRoleIn"
+   },
    "MemoryIn": {
     "properties": {
      "title": {
@@ -8337,6 +9999,32 @@
      "consent_publish"
     ],
     "title": "MemoryIn"
+   },
+   "MessageIn": {
+    "properties": {
+     "body": {
+      "type": "string",
+      "maxLength": 4000,
+      "minLength": 1,
+      "title": "Body"
+     },
+     "reply_to": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reply To"
+     }
+    },
+    "type": "object",
+    "required": [
+     "body"
+    ],
+    "title": "MessageIn"
    },
    "ModelIn": {
     "properties": {
@@ -8597,6 +10285,89 @@
     ],
     "title": "PolicyIn"
    },
+   "PostIn": {
+    "properties": {
+     "title": {
+      "type": "string",
+      "maxLength": 160,
+      "minLength": 5,
+      "title": "Title"
+     },
+     "subtitle": {
+      "type": "string",
+      "maxLength": 240,
+      "title": "Subtitle",
+      "default": ""
+     },
+     "blocks": {
+      "items": {
+       "$ref": "#/components/schemas/Block_"
+      },
+      "type": "array",
+      "maxItems": 200,
+      "minItems": 1,
+      "title": "Blocks"
+     },
+     "cover_media_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Cover Media Id"
+     },
+     "destination_slug": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 100
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Destination Slug"
+     },
+     "tags": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "maxItems": 8,
+      "title": "Tags"
+     },
+     "locale": {
+      "type": "string",
+      "enum": [
+       "en",
+       "ti",
+       "am"
+      ],
+      "title": "Locale",
+      "default": "en"
+     },
+     "consent_publish": {
+      "type": "boolean",
+      "title": "Consent Publish"
+     },
+     "notify_subscribers": {
+      "type": "boolean",
+      "title": "Notify Subscribers",
+      "default": true
+     }
+    },
+    "type": "object",
+    "required": [
+     "title",
+     "blocks",
+     "consent_publish"
+    ],
+    "title": "PostIn"
+   },
    "ProfileIn": {
     "properties": {
      "display_name": {
@@ -8815,6 +10586,45 @@
     ],
     "title": "ProviderIn"
    },
+   "PublicationIn": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "maxLength": 120,
+      "minLength": 2,
+      "title": "Name"
+     },
+     "tagline": {
+      "type": "string",
+      "maxLength": 200,
+      "title": "Tagline",
+      "default": ""
+     },
+     "about": {
+      "type": "string",
+      "maxLength": 4000,
+      "title": "About",
+      "default": ""
+     },
+     "cover_media_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Cover Media Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name"
+    ],
+    "title": "PublicationIn"
+   },
    "PublishIn": {
     "properties": {
      "note": {
@@ -8838,6 +10648,35 @@
     },
     "type": "object",
     "title": "PublishIn"
+   },
+   "ReactionIn": {
+    "properties": {
+     "emoji": {
+      "type": "string",
+      "maxLength": 8,
+      "title": "Emoji"
+     }
+    },
+    "type": "object",
+    "required": [
+     "emoji"
+    ],
+    "title": "ReactionIn"
+   },
+   "ReadIn": {
+    "properties": {
+     "ids": {
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "type": "array",
+      "maxItems": 100,
+      "title": "Ids"
+     }
+    },
+    "type": "object",
+    "title": "ReadIn"
    },
    "RegisterIn": {
     "properties": {
@@ -9620,6 +11459,70 @@
     ],
     "title": "SourceIn"
    },
+   "SpaceIn": {
+    "properties": {
+     "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,58}$",
+      "title": "Slug"
+     },
+     "name_i18n": {
+      "additionalProperties": {
+       "type": "string"
+      },
+      "propertyNames": {
+       "enum": [
+        "en",
+        "ti",
+        "am"
+       ]
+      },
+      "type": "object",
+      "title": "Name I18N"
+     },
+     "description_i18n": {
+      "additionalProperties": {
+       "type": "string"
+      },
+      "propertyNames": {
+       "enum": [
+        "en",
+        "ti",
+        "am"
+       ]
+      },
+      "type": "object",
+      "title": "Description I18N"
+     },
+     "icon": {
+      "type": "string",
+      "maxLength": 16,
+      "title": "Icon",
+      "default": "✳"
+     },
+     "sort_order": {
+      "type": "integer",
+      "title": "Sort Order",
+      "default": 100
+     },
+     "channels": {
+      "items": {
+       "$ref": "#/components/schemas/ChannelIn"
+      },
+      "type": "array",
+      "maxItems": 30,
+      "minItems": 1,
+      "title": "Channels"
+     }
+    },
+    "type": "object",
+    "required": [
+     "slug",
+     "name_i18n",
+     "channels"
+    ],
+    "title": "SpaceIn"
+   },
    "SponsorIn": {
     "properties": {
      "name": {
@@ -9677,6 +11580,22 @@
      "display_name"
     ],
     "title": "StaffCreateIn"
+   },
+   "SubscribeIn": {
+    "properties": {
+     "subscribe": {
+      "type": "boolean",
+      "title": "Subscribe",
+      "default": true
+     },
+     "email_digest": {
+      "type": "boolean",
+      "title": "Email Digest",
+      "default": false
+     }
+    },
+    "type": "object",
+    "title": "SubscribeIn"
    },
    "TokenIn": {
     "properties": {
@@ -9981,6 +11900,21 @@
     ],
     "title": "CategoryIn"
    },
+   "app__modules__community__router__CommentIn": {
+    "properties": {
+     "body": {
+      "type": "string",
+      "maxLength": 1500,
+      "minLength": 2,
+      "title": "Body"
+     }
+    },
+    "type": "object",
+    "required": [
+     "body"
+    ],
+    "title": "CommentIn"
+   },
    "app__modules__content__router__CategoryIn": {
     "properties": {
      "slug": {
@@ -10187,6 +12121,109 @@
      "title_i18n"
     ],
     "title": "EventIn"
+   },
+   "app__modules__planner__router__EditIn": {
+    "properties": {
+     "title": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 160,
+        "minLength": 2
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Title"
+     },
+     "days": {
+      "items": {
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "type": "array",
+      "maxItems": 14,
+      "title": "Days"
+     },
+     "locale": {
+      "type": "string",
+      "enum": [
+       "en",
+       "ti",
+       "am"
+      ],
+      "title": "Locale",
+      "default": "en"
+     },
+     "start_date": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start Date"
+     },
+     "note": {
+      "type": "string",
+      "maxLength": 300,
+      "title": "Note",
+      "default": ""
+     }
+    },
+    "type": "object",
+    "required": [
+     "days"
+    ],
+    "title": "EditIn"
+   },
+   "app__modules__social__router__CommentIn": {
+    "properties": {
+     "body": {
+      "type": "string",
+      "maxLength": 2000,
+      "minLength": 2,
+      "title": "Body"
+     },
+     "parent_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Parent Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "body"
+    ],
+    "title": "CommentIn"
+   },
+   "app__modules__social__router__EditIn": {
+    "properties": {
+     "body": {
+      "type": "string",
+      "maxLength": 4000,
+      "minLength": 1,
+      "title": "Body"
+     }
+    },
+    "type": "object",
+    "required": [
+     "body"
+    ],
+    "title": "EditIn"
    },
    "app__modules__tie__router__AskIn": {
     "properties": {
