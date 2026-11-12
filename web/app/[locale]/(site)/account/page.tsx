@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Container, PageHeader } from "@/components/ui";
 import { AccountPanel } from "@/components/site/account";
+import { PublicationSettings } from "@/components/site/journal";
 import { makeT } from "@/lib/i18n";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/account">): Promise<Metadata> {
@@ -16,6 +17,9 @@ export default async function AccountPage({ params }: PageProps<"/[locale]/accou
       <PageHeader title={t("account.title")} />
       <Container className="py-10">
         <AccountPanel />
+        <div className="mt-8">
+          <PublicationSettings />
+        </div>
       </Container>
     </>
   );
