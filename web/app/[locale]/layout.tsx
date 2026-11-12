@@ -25,14 +25,21 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
     title: { default: `${t("brand.name")} — ${t("brand.tagline")}`, template: `%s · ${t("brand.name")}` },
     description: t("home.lead"),
     manifest: "/manifest.webmanifest",
-    icons: { icon: "/icons/icon.svg", apple: "/icons/icon-192.png" },
+    icons: { icon: [{ url: "/favicon.ico" }, { url: "/icons/icon-192.png", type: "image/png" }], apple: "/icons/apple-touch-icon.png" },
+    openGraph: {
+      title: t("brand.name"),
+      description: t("home.lead"),
+      images: [{ url: "/brand/og-image.png", width: 1200, height: 630, alt: "Visit Tigray" }],
+      type: "website",
+    },
+    twitter: { card: "summary_large_image", images: ["/brand/og-image.png"] },
     alternates: { languages: Object.fromEntries(LOCALES.map((l) => [l, `/${l}`])) },
   };
 }
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#102d27" },
+    { media: "(prefers-color-scheme: light)", color: "#0a4424" },
     { media: "(prefers-color-scheme: dark)", color: "#0c1512" },
   ],
   width: "device-width",

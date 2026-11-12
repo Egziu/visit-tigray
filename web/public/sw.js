@@ -13,7 +13,7 @@ const SHELL = `vt-shell-${VERSION}`;
 const PAGES = `vt-pages-${VERSION}`;
 const API = `vt-api-${VERSION}`;
 const LOCALES = ["en", "ti", "am"];
-const PRECACHE = [...LOCALES.map((l) => `/${l}/offline`), "/manifest.webmanifest", "/icons/icon.svg"];
+const PRECACHE = [...LOCALES.map((l) => `/${l}/offline`), "/manifest.webmanifest", "/icons/icon-192.png", "/brand/visit-tigray-logo-520.webp"];
 
 const PRIVATE_PAGE = /^\/(en|ti|am)\/(bureau|account)(\/|$)/;
 const NEVER_CACHE_API = /^\/api\/(me|auth|bureau|tie|itineraries|shared-itineraries)(\/|$)/;
