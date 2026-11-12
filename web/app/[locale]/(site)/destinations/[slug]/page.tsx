@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Alert, ButtonLink, Container } from "@/components/ui";
 import { AdvisoryCard, MediaFigure, ServiceDown, TrustBadges } from "@/components/site/content";
 import { CardArt } from "@/components/site/illustrations";
+import { GuideDrawer } from "@/components/site/guide-chat";
 import { SaveOffline } from "@/components/site/pwa";
 import { formatDate, formatDuration } from "@/lib/format";
 import { makeT } from "@/lib/i18n";
@@ -69,8 +70,9 @@ export default async function DestinationPage({ params }: PageProps<"/[locale]/d
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <SaveOffline item={{ key: `destination:${d.slug}:${locale}`, kind: "destination", title: d.name, href: `/${locale}/destinations/${d.slug}`, locale, sourceUpdatedAt: d.verified_at, data: d }} />
-            <ButtonLink href={`/${locale}/guide?destination=${d.slug}`} variant="secondary" size="sm">
-              {t("destinations.askGuide", { name: d.name })}
+            <GuideDrawer destinationSlug={d.slug} destinationName={d.name} />
+            <ButtonLink href={`/${locale}/guide?destination=${d.slug}`} variant="ghost" size="sm">
+              {t("destinations.openFullGuide")}
             </ButtonLink>
             <ButtonLink href={`/${locale}/plan?include=${d.slug}`} variant="secondary" size="sm">
               {t("destinations.planWith")}

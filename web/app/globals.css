@@ -2,22 +2,24 @@
 
 /* =====================================================================
    Visit Tigray design tokens
-   Palette: warm ivory, sandstone, natural earth, olive, deep forest green.
+   Palette taken from the Visit Tigray logo: cream, deep forest green (#0a4424) and
+   terracotta sun (#c06830, decorative only — 3.6:1, never used for small text).
    All text/background pairs below meet WCAG 2.2 AA (>= 4.5:1 for body text).
    ===================================================================== */
 :root {
-  --color-bg: #f7f2e8;          /* warm ivory */
-  --color-surface: #fffcf6;     /* paper */
-  --color-surface-2: #efe7d8;   /* sand wash */
-  --color-ink: #1c211d;         /* 15.0:1 on bg */
-  --color-muted: #545b52;       /* 6.6:1 on bg */
-  --color-line: #ddd2bf;
-  --color-forest: #102d27;      /* deep green — primary */
-  --color-forest-2: #1f4a3f;
-  --color-on-forest: #f7f2e8;
+  --color-bg: #f8f2e9;          /* logo cream */
+  --color-surface: #fffaf2;     /* paper */
+  --color-surface-2: #efe6d5;   /* sand wash */
+  --color-ink: #1c211d;         /* 14.7:1 on bg */
+  --color-muted: #545b52;       /* 6.3:1 on bg */
+  --color-line: #ddd0ba;
+  --color-forest: #0a4424;      /* logo green — primary, 10.1:1 on bg */
+  --color-forest-2: #12573a;
+  --color-on-forest: #f8f2e9;
+  --color-terracotta: #c06830;  /* logo sun — decorative only */
   --color-olive: #59613a;       /* 6.1:1 on bg */
   --color-sandstone: #b98a5a;
-  --color-earth: #7c4a26;       /* accent text — 6.8:1 on bg */
+  --color-earth: #8f4a1f;       /* accent text — 6.0:1 on bg */
   --color-gold: #c9a160;
   --color-focus: #8a5a1f;
   --color-info: #1f4a6b;
@@ -39,12 +41,13 @@
     --color-ink: #efe9dc;
     --color-muted: #b5ad9b;
     --color-line: #2b3c35;
-    --color-forest: #cfe3d6;
-    --color-forest-2: #a9cbb8;
+    --color-forest: #bfe0c8;
+    --color-forest-2: #9fceb0;
     --color-on-forest: #0c1512;
+    --color-terracotta: #d98b5a;
     --color-olive: #c2c99a;
     --color-sandstone: #d4a877;
-    --color-earth: #e2b58a;
+    --color-earth: #e8b48a;
     --color-gold: #d9b37a;
     --color-focus: #f0c98d;
     --color-info: #9cc6e8;
@@ -62,12 +65,13 @@
   --color-ink: #efe9dc;
   --color-muted: #b5ad9b;
   --color-line: #2b3c35;
-  --color-forest: #cfe3d6;
-  --color-forest-2: #a9cbb8;
+  --color-forest: #bfe0c8;
+  --color-forest-2: #9fceb0;
   --color-on-forest: #0c1512;
+  --color-terracotta: #d98b5a;
   --color-olive: #c2c99a;
   --color-sandstone: #d4a877;
-  --color-earth: #e2b58a;
+  --color-earth: #e8b48a;
   --color-gold: #d9b37a;
   --color-focus: #f0c98d;
   --color-info: #9cc6e8;
@@ -86,6 +90,7 @@
   --color-line: var(--color-line);
   --color-forest: var(--color-forest);
   --color-forest-2: var(--color-forest-2);
+  --color-terracotta: var(--color-terracotta);
   --color-on-forest: var(--color-on-forest);
   --color-olive: var(--color-olive);
   --color-sandstone: var(--color-sandstone);
@@ -188,4 +193,26 @@ html[data-saver="on"] .saver-hide { display: none !important; }
   body { background: #fff; color: #000; font-size: 11pt; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9pt; }
   .print-break { break-before: page; }
+}
+
+/* Component classes live in the components layer so Tailwind utilities (e.g. `hidden`) win. */
+@layer components {
+/* ---------------------------------------------------------------- brand */
+/* The logo artwork has a cream ground; in dark mode it sits on a cream badge so it stays legible. */
+.brand-badge { display: inline-flex; align-items: center; border-radius: 12px; }
+:root[data-theme="dark"] .brand-badge { background: #f8f2e9; padding: 2px 8px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .brand-badge { background: #f8f2e9; padding: 2px 8px; } }
+.hairline { border-color: color-mix(in srgb, var(--color-line) 80%, transparent); }
+.sun-rule { height: 2px; background: linear-gradient(90deg, transparent, var(--color-terracotta), transparent); }
+
+/* ---------------------------------------------------------------- long-form reader (journal) */
+.reader { max-width: 68ch; font-size: 1.15rem; line-height: 1.8; }
+.reader p { margin: 0 0 1.15em; white-space: pre-line; }
+.reader h2 { font-size: 1.9rem; margin: 1.6em 0 0.5em; }
+.reader blockquote { margin: 1.6em 0; padding: 0.2em 0 0.2em 1.2em; border-left: 3px solid var(--color-terracotta); font-family: var(--font-display); font-size: 1.55rem; line-height: 1.35; font-style: italic; }
+.reader figure { margin: 2em 0; }
+.reader figcaption { margin-top: 0.6em; font-size: 0.85rem; color: var(--color-muted); }
+.reader hr { margin: 2.5em auto; width: 120px; border: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--color-terracotta), transparent); }
+.reader .dropcap::first-letter { float: left; font-family: var(--font-display); font-size: 4.2em; line-height: 0.85; padding: 0.06em 0.12em 0 0; color: var(--color-forest); }
+:lang(ti) .reader .dropcap::first-letter, :lang(am) .reader .dropcap::first-letter { float: none; font-size: inherit; padding: 0; }
 }

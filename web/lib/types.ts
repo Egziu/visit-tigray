@@ -153,6 +153,24 @@ export interface TieAnswer {
   /** null when no language model produced the answer (retrieval-only / fallback). */
   provider: { name: string; local: boolean; model?: string | null } | null;
   latency_ms: number;
+  actions?: GuideAction[];
+}
+
+export type GuideAction =
+  | { type: "open_planner"; label: string; params: { days?: number; interests?: string[]; start_slug?: string } }
+  | { type: "open_destination"; label: string; slug: string };
+
+export interface ConversationSummary {
+  id: string;
+  title: string;
+  persona: string;
+  updated_at: string;
+  message_count: number;
+}
+
+export interface Suggestion {
+  text: string;
+  category: string;
 }
 
 export interface PlanStop {
@@ -164,6 +182,7 @@ export interface PlanStop {
   permit_required: TriState;
   advisory_level: AdvisoryLevel | null;
   reasons: string[];
+  alternatives?: { slug: string; name: string; reason: string }[];
   travel_from_previous: {
     distance_km: number | null;
     duration_minutes: number | null;
@@ -179,6 +198,127 @@ export interface Plan {
   excluded: { slug: string; name: string; reason: string }[];
   virtual_alternatives: { slug: string; name: string }[];
   generated_at: string;
+  checklist?: ChecklistItem[];
+  summary?: { stop_count: number; days: number; known_minutes: number; verified_legs: number; unverified_legs: number };
+  edited?: boolean;
+}
+
+export interface ChecklistItem {
+  kind: "permit" | "advisory" | "accessibility" | "verification" | "duration" | "travel";
+  text: string;
+  slugs: string[];
+}
+
+/* ------------------------------------------------------------------ Journals (Substack-like) */
+
+export interface PersonRef {
+  handle: string;
+  display_name: string;
+}
+
+export interface JournalSummary {
+  id: string;
+  title: string;
+  subtitle: string;
+  excerpt: string;
+  cover: MediaItem | null;
+  author: PersonRef;
+  publication: { handle: string; name: string };
+  destination: { slug: string; name: string } | null;
+  tags: string[];
+  published_at: string | null;
+  reading_minutes: number;
+  like_count: number;
+  comment_count: number;
+  liked: boolean;
+}
+
+export type BlockType = "paragraph" | "heading" | "quote" | "image" | "divider";
+
+export interface JournalBlock {
+  type: BlockType;
+  text?: string;
+  media?: MediaItem | null;
+  caption?: string;
+}
+
+export interface JournalPost extends JournalSummary {
+  blocks: JournalBlock[];
+  status?: string;
+  is_author?: boolean;
+}
+
+export interface JournalComment {
+  id: string;
+  parent_id: string | null;
+  body: string;
+  author: PersonRef;
+  created_at: string;
+  can_delete: boolean;
+}
+
+export interface Publication {
+  handle: string;
+  name: string;
+  tagline: string;
+  about: string;
+  cover: MediaItem | null;
+  author: { display_name: string };
+  subscriber_count: number;
+  is_subscribed: boolean;
+  email_digest: boolean;
+  posts: JournalSummary[];
+}
+
+export interface NotificationItem {
+  id: string;
+  kind: string;
+  title: string;
+  body: string;
+  link: string | null;
+  created_at: string;
+  read: boolean;
+}
+
+/* ------------------------------------------------------------------ Spaces (Discord-like) */
+
+export interface Channel {
+  slug: string;
+  name: string;
+  topic: string;
+  kind: "text" | "announcements";
+  slow_mode_seconds: number;
+  can_post: boolean;
+}
+
+export interface Space {
+  slug: string;
+  name: string;
+  description: string;
+  icon: string | null;
+  member_count: number;
+  is_member: boolean;
+  my_role: "member" | "moderator" | null;
+  channels: Channel[];
+}
+
+export interface Reaction {
+  emoji: string;
+  count: number;
+  mine: boolean;
+}
+
+export interface SpaceMessage {
+  id: number;
+  author: PersonRef & { role?: string | null };
+  body: string;
+  reply_to: { id: number; excerpt: string; author: PersonRef | string } | null;
+  reactions: Reaction[];
+  created_at: string;
+  edited_at: string | null;
+  status: "visible" | "held" | "removed";
+  can_edit: boolean;
+  can_delete: boolean;
 }
 
 export interface Memory {

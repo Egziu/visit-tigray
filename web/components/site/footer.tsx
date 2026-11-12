@@ -1,19 +1,20 @@
 import Link from "next/link";
 import { makeT } from "@/lib/i18n";
-import { Emblem, PatternBand } from "./illustrations";
+import Image from "next/image";
+import { PatternBand } from "./illustrations";
 
 export function Footer({ locale }: { locale: string }) {
   const t = makeT(locale);
   const l = (p: string) => `/${locale}${p}`;
   return (
-    <footer className="mt-24 bg-[#102d27] text-[#efe9dc]">
+    <footer className="mt-24 bg-[#0a4424] text-[#efe9dc]">
       <PatternBand className="h-3 w-full text-[#c9a160]" />
       <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 md:grid-cols-[2fr_1fr_1fr_1fr]">
         <div>
-          <div className="flex items-center gap-3">
-            <Emblem className="h-10 w-10 text-[#1f4a3f]" />
-            <span className="font-display text-2xl">{t("brand.name")}</span>
-          </div>
+          <span className="inline-flex rounded-2xl bg-[#f8f2e9] p-3">
+            <Image src="/brand/visit-tigray-logo-520.webp" alt="Visit Tigray" width={180} height={120} unoptimized className="h-[120px] w-auto" />
+          </span>
+          <p className="mt-4 font-display text-xl text-[#efe9dc]">{t("brand.tagline")}</p>
           <p className="mt-4 max-w-sm text-sm text-[#c9c1af]">{t("footer.status")}</p>
           <p className="mt-3 max-w-sm text-sm text-[#c9c1af]">{t("footer.partner")}</p>
         </div>
@@ -25,6 +26,8 @@ export function Footer({ locale }: { locale: string }) {
           <Link href={l("/plan")}>{t("nav.plan")}</Link>
         </FooterCol>
         <FooterCol title={t("footer.community")}>
+          <Link href={l("/journal")}>{t("nav.journal")}</Link>
+          <Link href={l("/spaces")}>{t("nav.spaces")}</Link>
           <Link href={l("/memories")}>{t("nav.memories")}</Link>
           <Link href={l("/awards")}>{t("nav.awards")}</Link>
           <Link href={l("/providers")}>{t("nav.providers")}</Link>

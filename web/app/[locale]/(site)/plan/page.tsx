@@ -3,6 +3,8 @@ import { Container, PageHeader } from "@/components/ui";
 import { Planner } from "@/components/site/planner";
 import { makeT } from "@/lib/i18n";
 
+const str = (v: string | string[] | undefined) => (typeof v === "string" && v ? v : undefined);
+
 export async function generateMetadata({ params }: PageProps<"/[locale]/plan">): Promise<Metadata> {
   const { locale } = await params;
   return { title: makeT(locale)("plan.title") };
@@ -16,7 +18,13 @@ export default async function PlanPage({ params, searchParams }: PageProps<"/[lo
     <>
       <PageHeader title={t("plan.title")} lead={t("plan.lead")} />
       <Container className="py-10">
-        <Planner include={typeof sp.include === "string" ? sp.include : undefined} itineraryId={typeof sp.itinerary === "string" ? sp.itinerary : undefined} />
+        <Planner
+          include={str(sp.include)}
+          itineraryId={str(sp.itinerary)}
+          initialDays={str(sp.days) ? Number(str(sp.days)) || undefined : undefined}
+          initialInterests={str(sp.interests)?.split(",").filter(Boolean)}
+          initialStart={str(sp.start)}
+        />
       </Container>
     </>
   );

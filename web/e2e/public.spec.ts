@@ -74,7 +74,7 @@ test.describe("accessibility", () => {
     await expect(page).toHaveURL(/#main$/);
   });
 
-  for (const path of ["/en", "/en/destinations/aksum", "/ti", "/am/destinations", "/en/plan", "/en/guide", "/en/map", "/en/account", "/en/bureau", "/en/offline"]) {
+  for (const path of ["/en", "/en/destinations/aksum", "/ti", "/am/destinations", "/en/plan", "/en/guide", "/en/map", "/en/account", "/en/bureau", "/en/offline", "/en/journal", "/en/spaces", "/en/spaces/travellers-lounge/general"]) {
     test(`no serious/critical axe violations on ${path}`, async ({ page }) => {
       await page.goto(path);
       await page.waitForLoadState("networkidle");
@@ -85,7 +85,7 @@ test.describe("accessibility", () => {
 
 test.describe("mobile", () => {
   test.use({ viewport: { width: 390, height: 844 } });
-  for (const path of ["/en", "/en/destinations", "/en/destinations/aksum", "/am", "/en/plan", "/en/bureau"]) {
+  for (const path of ["/en", "/en/destinations", "/en/destinations/aksum", "/am", "/en/plan", "/en/guide", "/en/journal", "/en/spaces", "/en/spaces/travellers-lounge/general", "/en/bureau"]) {
     test(`no horizontal scroll on ${path}`, async ({ page }) => {
       await page.goto(path);
       await page.waitForLoadState("networkidle");
@@ -105,24 +105,34 @@ test.describe("mobile", () => {
 });
 
 test.describe("guide and planner (live API)", () => {
-  test("guide answers with citations and provenance", async ({ page }) => {
+  test("guide shows starter prompts, answers with citations and opens the Sources panel", async ({ page }) => {
     await page.goto("/en/guide");
+    await expect(page.getByText(/Answers from approved sources only/)).toBeVisible();
+    await expect(page.getByText("Try asking")).toBeVisible();
     await page.getByLabel("Your question").fill("What is Aksum known for?");
-    await page.getByRole("button", { name: "Ask" }).click();
+    await page.getByRole("button", { name: "Ask", exact: true }).click();
     await expect(page.getByText("Grounded in sources").or(page.getByText("Partially supported"))).toBeVisible({ timeout: 20_000 });
-    await expect(page.locator("summary", { hasText: "Sources" })).toBeVisible();
-    // Inline [n] markers link to their citation entries
-    await expect(page.getByRole("link", { name: "[1]" }).first()).toBeVisible();
+    // [n] chips open the right-hand Sources panel on that citation
+    await page.getByRole("button", { name: "Open source 1" }).first().click();
+    const panel = page.getByRole("region", { name: "Sources" });
+    await expect(panel).toBeVisible();
+    await expect(panel.locator("li").first()).toBeVisible();
     await expect(page.getByText(/verify official information/i)).toBeVisible();
   });
 
-  test("planner builds an explained itinerary", async ({ page }) => {
-    await page.goto("/en/plan");
-    await page.getByLabel("Number of days").fill("2");
+  test("planner builds an editable timeline with a checklist", async ({ page }) => {
+    await page.goto("/en/plan?days=2&interests=history,heritage");
+    await expect(page.getByLabel("Number of days")).toHaveValue("2");
     await page.getByRole("button", { name: "Create plan" }).click();
     await expect(page.getByRole("heading", { name: "Day 1" })).toBeVisible();
     await expect(page.getByText("Why this stop").first()).toBeVisible();
-    await expect(page.getByText(/Planning aid only|not a travel clearance/i).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Before you go" })).toBeVisible();
+    await expect(page.getByText(/verified|straight-line|Travel time unknown/).first()).toBeVisible();
+    // Keyboard reordering is re-validated by the planner
+    const firstStop = page.locator("section[aria-labelledby='day-1'] article").first();
+    const name = (await firstStop.getAttribute("aria-label")) ?? "";
+    await page.getByRole("button", { name: `Move ${name} later` }).click();
+    await expect(page.getByText("You edited this plan")).toBeVisible();
   });
 });
 
