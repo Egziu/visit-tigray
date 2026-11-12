@@ -5,6 +5,7 @@ import { Alert, Badge, Button, Card, Checkbox, EmptyState, Input, Loading, Selec
 import { useI18n, useSession } from "@/components/site/providers";
 import { api } from "@/lib/api";
 import { formatDateTime } from "@/lib/format";
+import type { MsgKey } from "@/lib/i18n";
 import { BureauTitle } from "./shell";
 import { LoadError, useAction, useLoad } from "./hooks";
 
@@ -13,13 +14,23 @@ import { LoadError, useAction, useLoad } from "./hooks";
 interface ModItem {
   kind: string;
   id: string;
-  title?: string;
+  title?: string | null;
+  subtitle?: string | null;
   body: string;
-  author?: { display_name: string; handle?: string };
+  author?: { display_name: string; handle?: string } | string | null;
+  context?: { space?: string | null; channel?: string | null };
   reports?: { reason: string; detail?: string }[];
   ai_flags?: { label: string; score?: number }[] | string[];
   created_at: string;
 }
+
+const KIND_LABEL: Record<string, MsgKey> = {
+  memory: "bureau.moderation.kind.memory",
+  comment: "bureau.moderation.kind.comment",
+  journal_post: "bureau.moderation.kind.journal_post",
+  journal_comment: "bureau.moderation.kind.journal_comment",
+  space_message: "bureau.moderation.kind.space_message",
+};
 
 export function ModerationQueue() {
   const { t, locale } = useI18n();
@@ -52,11 +63,17 @@ function ModCard({ m, locale, onDone }: { m: ModItem; locale: string; onDone: ()
   return (
     <li className="rounded-[var(--radius)] border border-line bg-surface p-6">
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
-        <Badge>{m.kind}</Badge>
-        {m.author && <span>{m.author.display_name}</span>}
+        <Badge tone={m.kind === "space_message" ? "info" : m.kind.startsWith("journal") ? "earth" : "neutral"}>{KIND_LABEL[m.kind] ? t(KIND_LABEL[m.kind]) : m.kind}</Badge>
+        {m.author && <span>{typeof m.author === "string" ? m.author : m.author.display_name}</span>}
+        {m.context?.space && (
+          <span>
+            {m.context.space} · #{m.context.channel}
+          </span>
+        )}
         <span>{formatDateTime(m.created_at, locale)}</span>
       </div>
       {m.title && <h2 className="mt-2 text-2xl">{m.title}</h2>}
+      {m.subtitle && <p className="mt-1 text-muted">{m.subtitle}</p>}
       <p className="mt-2 whitespace-pre-line">{m.body}</p>
       {m.reports && m.reports.length > 0 && (
         <div className="mt-3">
