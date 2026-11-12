@@ -195,6 +195,8 @@ html[data-saver="on"] .saver-hide { display: none !important; }
   .print-break { break-before: page; }
 }
 
+/* Component classes live in the components layer so Tailwind utilities (e.g. `hidden`) win. */
+@layer components {
 /* ---------------------------------------------------------------- brand */
 /* The logo artwork has a cream ground; in dark mode it sits on a cream badge so it stays legible. */
 .brand-badge { display: inline-flex; align-items: center; border-radius: 12px; }
@@ -213,3 +215,4 @@ html[data-saver="on"] .saver-hide { display: none !important; }
 .reader hr { margin: 2.5em auto; width: 120px; border: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--color-terracotta), transparent); }
 .reader .dropcap::first-letter { float: left; font-family: var(--font-display); font-size: 4.2em; line-height: 0.85; padding: 0.06em 0.12em 0 0; color: var(--color-forest); }
 :lang(ti) .reader .dropcap::first-letter, :lang(am) .reader .dropcap::first-letter { float: none; font-size: inherit; padding: 0; }
+}
