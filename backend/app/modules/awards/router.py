@@ -294,7 +294,8 @@ class GateIn(BaseModel):
 
 
 @router.post("/bureau/competitions/{slug}/gates")
-def record_gate(slug: str, body: GateIn, request: Request, p: Principal = Depends(current_principal),
+def record_gate(slug: str, body: GateIn, request: Request,
+                p: Principal = Depends(require("awards.authorize", "awards.finance", any_of=True)),
                 db: Session = Depends(get_db)):
     c = _comp(db, slug)
     need = {"legal_terms": "awards.authorize", "funding": "awards.finance", "bureau_authorization": "awards.authorize"}[body.gate]
