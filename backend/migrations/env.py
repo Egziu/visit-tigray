@@ -12,7 +12,11 @@ from app.modules.registry import load_models
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name, disable_existing_loggers=False)
-config.set_main_option("sqlalchemy.url", get_settings().database_url.replace("%", "%%"))
+import os  # noqa: E402
+
+# Migrations run as the schema-owning role; the API runs as the restricted vt_app role.
+_url = os.environ.get("DATABASE_MIGRATION_URL") or get_settings().database_url
+config.set_main_option("sqlalchemy.url", _url.replace("%", "%%"))
 load_models()
 target_metadata = Base.metadata
 

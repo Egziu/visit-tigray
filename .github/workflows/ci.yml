@@ -1,14 +1,111 @@
-name: tests
+name: ci
 on:
   push:
   pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  python:
-    runs-on: ubuntu-latest
+  backend:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      TEST_DATABASE_ADMIN_URL: postgresql+psycopg://postgres:postgres@localhost:5432/postgres
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/vt_ci
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
+      - name: Add pgvector to the PostGIS service container
+        run: docker exec ${{ job.services.postgres.id }} sh -c "apt-get update -qq && apt-get install -y -qq postgresql-16-pgvector"
       - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: astral-sh/setup-uv@v6
+      - name: Install locked dependencies
+        run: uv venv .venv && uv pip install -p .venv -r requirements.lock -r requirements-dev.lock
+      - name: Lint (ruff)
+        run: .venv/bin/ruff check .
+      - name: Type check (mypy)
+        run: .venv/bin/mypy app
+      - name: Security lint (bandit)
+        run: .venv/bin/bandit -q -c pyproject.toml -r app
+      - name: Dependency audit (pip-audit)
+        run: .venv/bin/pip-audit -r requirements.lock -r requirements-dev.lock --progress-spinner off
+      - name: Migrations apply, round-trip and have no drift
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE vt_ci"
+          .venv/bin/alembic upgrade head
+          .venv/bin/alembic downgrade base
+          .venv/bin/alembic upgrade head
+          .venv/bin/alembic check
+      - name: Tests (pytest + coverage)
+        run: .venv/bin/pytest --cov=app --cov-report=term --cov-report=xml
+      - name: AI evaluation (retrieval-only, seeded synthetic corpus)
+        env: { ENVIRONMENT: development }
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "DROP DATABASE vt_ci WITH (FORCE)" -c "CREATE DATABASE vt_ci"
+          .venv/bin/alembic upgrade head && .venv/bin/python -m app.seed
+          .venv/bin/python -m app.modules.tie.evaluation --mode retrieval_only --out eval-report.md
+      - name: SBOM (CycloneDX)
+        run: .venv/bin/cyclonedx-py requirements requirements.lock -o sbom-backend.cdx.json
+      - uses: actions/upload-artifact@v4
         with:
-          python-version: '3.12'
-      - run: pip install -r requirements.txt
-      - run: pytest -q
+          name: backend-reports
+          path: |
+            backend/coverage.xml
+            backend/eval-report.md
+            backend/eval-report.json
+            backend/sbom-backend.cdx.json
+
+  web:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "22", cache: npm, cache-dependency-path: web/package-lock.json }
+      - run: npm ci
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm test --if-present
+      - run: npm run build
+      - name: Dependency audit (production deps, high+)
+        run: npm audit --omit=dev --audit-level=high
+
+  secrets-scan:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  compose:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate docker compose (all profiles)
+        run: |
+          cp .env.example .env.ci && sed -i 's/=replace-me/=ci/; s/=replace-with-48+-random-characters/=ci-secret-key-not-for-production/' .env.ci
+          docker compose --env-file .env.ci --profile ai --profile sso --profile scan --profile storage --profile observability config -q
+      - name: Build images
+        run: |
+          docker build -f infra/docker/api.Dockerfile -t visit-tigray-api:ci .
+          docker build -t visit-tigray-db:ci infra/postgres
