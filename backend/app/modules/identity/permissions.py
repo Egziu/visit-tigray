@@ -40,6 +40,7 @@ PERMISSIONS: dict[str, str] = {
     "providers.verify": "Verify tourism providers and licences",
     # operations
     "analytics.view": "View analytics dashboards",
+    "tourism_stats.record": "Record measured tourism statistics with their source",
     "reports.export": "Export reports",
     "editorial.assign": "Assign editorial tasks",
     "users.manage": "Manage staff accounts and role assignments",
@@ -50,7 +51,7 @@ PERMISSIONS: dict[str, str] = {
 
 ROLES: dict[str, tuple[str, list[str]]] = {
     "executive": ("Executive leadership", ["analytics.view", "reports.export", "destinations.read_draft", "bureau.assistant", "audit.view"]),
-    "tourism_officer": ("Tourism officer", ["destinations.read_draft", "destinations.edit", "advisories.manage", "events.manage", "analytics.view", "bureau.assistant", "editorial.assign"]),
+    "tourism_officer": ("Tourism officer", ["destinations.read_draft", "destinations.edit", "advisories.manage", "events.manage", "analytics.view", "bureau.assistant", "editorial.assign", "tourism_stats.record"]),
     "heritage_specialist": ("Cultural heritage specialist", ["destinations.read_draft", "destinations.edit", "destinations.publish", "knowledge.upload", "knowledge.review", "knowledge.publish", "knowledge.read_internal", "knowledge.read_restricted", "heritage.read_restricted", "media.manage", "bureau.assistant"]),
     "content_editor": ("Content editor", ["destinations.read_draft", "destinations.edit", "destinations.publish", "categories.manage", "events.manage", "media.manage", "knowledge.upload", "editorial.assign", "bureau.assistant"]),
     "translator": ("Translator", ["destinations.read_draft", "translations.edit"]),

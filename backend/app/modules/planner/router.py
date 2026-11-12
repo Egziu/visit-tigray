@@ -49,7 +49,11 @@ def _req(body: PlanIn) -> PlanRequest:
 
 @router.post("/planner/plan", dependencies=[Depends(rate_limit("default"))])
 def plan(body: PlanIn, db: Session = Depends(get_db)):
-    return build_plan(db, _req(body))
+    from app.modules.analytics.router import track
+    out = build_plan(db, _req(body))
+    track(db, "plan_created", locale=body.locale)
+    db.commit()
+    return out
 
 
 # ---------------------------------------------------------------- saved itineraries

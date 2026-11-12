@@ -66,6 +66,9 @@ def get_destination(slug: str, locale: str = "en", db: Session = Depends(get_db)
     if p is not None and p.has("heritage.read_restricted"):
         ll = svc.latlng(d.location)
         out["precise_coordinates"] = {"lat": ll[0], "lng": ll[1]} if ll else None
+    from app.modules.analytics.router import track
+    track(db, "destination_view", destination_slug=slug, locale=norm_locale(locale))
+    db.commit()
     return out
 
 

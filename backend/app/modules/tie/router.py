@@ -59,6 +59,8 @@ def ask(body: AskIn, db: Session = Depends(get_db), p: Principal | None = Depend
     require_flag(db, "ai_guide")
     ans = guide.ask(db, question=body.question, locale=body.locale, persona=body.persona, principal=p,
                     conversation_id=body.conversation_id, destination_slug=body.destination_slug)
+    from app.modules.analytics.router import track
+    track(db, "guide_question", destination_slug=body.destination_slug, locale=body.locale)
     db.commit()
     return ans.as_dict()
 
