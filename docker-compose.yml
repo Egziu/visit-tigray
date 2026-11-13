@@ -57,7 +57,7 @@ services:
   migrate:
     build: { context: ., dockerfile: infra/docker/api.Dockerfile }
     environment: *api-env
-    command: ["sh", "-c", "alembic upgrade head && psql \"$${DATABASE_MIGRATION_URL/+psycopg/}\" -f /srv/backend/../infra/postgres/post-migrate-grants.sql || true"]
+    command: ["bash", "scripts/predeploy.sh"]
     volumes: [./infra/postgres/post-migrate-grants.sql:/srv/infra/postgres/post-migrate-grants.sql:ro]
     depends_on: { db: { condition: service_healthy } }
     restart: "no"
