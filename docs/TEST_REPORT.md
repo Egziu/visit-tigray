@@ -84,3 +84,8 @@ because the per-IP AI rate limit (20/min) worked as designed with all virtual us
 * Signed-in browser e2e for memories and Bureau editing (covered by API tests; Spaces, Journals and itineraries now have browser tests).
 * Independent penetration test.
 * Point-in-time recovery rehearsal; production-sized restore timing.
+
+## 13 November 2026 revalidation
+
+See [current validation and remaining release gates](VALIDATION_2026-11-13.md).
+These fresh observations supersede earlier readiness claims only for checks explicitly rerun.
