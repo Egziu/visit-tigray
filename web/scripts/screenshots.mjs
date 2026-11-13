@@ -61,7 +61,7 @@ if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
     const setup = await (await api.post(`${BASE}/api/auth/mfa/setup`, { headers: { "x-csrf-token": csrf } })).json();
     secret = setup.secret;
     await api.post(`${BASE}/api/auth/mfa/enable`, { headers: { "x-csrf-token": csrf }, data: { code: totp(secret) } });
-    console.log("enrolled TOTP for dev admin (secret printed for reuse):", secret);
+    console.log("Enrolled TOTP for the development account.");
   } else {
     await api.post(`${BASE}/api/auth/mfa/verify`, { headers: { "x-csrf-token": csrf }, data: { code: totp(secret) } });
   }
