@@ -543,7 +543,12 @@ def message_out(db: Session, m: SpaceMessage, viewer: Principal | None, space_ro
         e["mine"] = e["mine"] or bool(viewer and r.user_id == viewer.id)
     reply = None
     if m.reply_to_id:
-        rm = db.get(SpaceMessage, m.reply_to_id)
+        ch = db.get(Channel, m.channel_id)
+        mod = _is_space_mod(viewer, db.get(SpaceMember, (ch.space_id, viewer.id)) if viewer and ch else None)
+        rm = db.execute(_visible_messages(
+            select(SpaceMessage).where(SpaceMessage.id == m.reply_to_id, SpaceMessage.channel_id == m.channel_id),
+            viewer, mod, _blocked_ids(db, viewer),
+        )).scalar_one_or_none()
         if rm is not None:
             reply = {"id": rm.id, "excerpt": "[removed]" if rm.status == "removed" else rm.body[:120],
                      "author": _user_label(db, rm.author_id)["display_name"]}
@@ -774,8 +779,7 @@ def stream(slug: str, channel: str, request: Request, after: int = 0, db: Sessio
     s = _space(db, slug)
     c = _channel(db, s, channel)
     viewer_id = p.id if p else None
-    mod = _is_space_mod(p, _membership(db, s.id, p))
-    blocked = _blocked_ids(db, p)
+    space_id = s.id
     update_cursor = db.execute(select(func.coalesce(func.max(SpaceMessage.updated_seq), 0))
                                .where(SpaceMessage.channel_id == c.id)).scalar_one()
     channel_id = c.id
@@ -787,11 +791,13 @@ def stream(slug: str, channel: str, request: Request, after: int = 0, db: Sessio
         yield _sse("ready", {"after": after})  # lets clients detect a working (unbuffered) stream immediately
         while time.monotonic() - started < STREAM_SECONDS:
             with session_factory()() as s2:
-                viewer = None
-                if viewer_id is not None:
-                    from app.modules.identity.service import permissions_for
-                    u = s2.get(User, viewer_id)
-                    viewer = Principal(user=u, session=p.session if p else None, permissions=permissions_for(s2, u)) if u else None
+                # Revalidate session, roles and blocks on every poll, including revocation.
+                viewer = optional_principal(request, s2)
+                if viewer_id is not None and viewer is None:
+                    yield _sse("reconnect", {"after": last_id})
+                    return
+                mod = _is_space_mod(viewer, _membership(s2, space_id, viewer))
+                blocked = _blocked_ids(s2, viewer)
                 base = _visible_messages(select(SpaceMessage).where(SpaceMessage.channel_id == channel_id), viewer, mod, blocked)
                 for m in s2.execute(base.where(SpaceMessage.id > last_id).order_by(SpaceMessage.id).limit(100)).scalars():
                     last_id = max(last_id, m.id)
@@ -801,12 +807,13 @@ def stream(slug: str, channel: str, request: Request, after: int = 0, db: Sessio
                                                                SpaceMessage.id <= last_id)
                                     .order_by(SpaceMessage.updated_seq).limit(100)).scalars():
                     last_upd = max(last_upd, m.updated_seq)
-                    if m.status == "held" and not mod and m.author_id != viewer_id:
-                        continue
-                    yield _sse("update", message_out(s2, m, viewer))
-                upd_max = s2.execute(select(func.coalesce(func.max(SpaceMessage.updated_seq), 0))
-                                     .where(SpaceMessage.channel_id == channel_id, SpaceMessage.id <= last_id)).scalar_one()
-                last_upd = max(last_upd, upd_max)
+                    if m.author_id in blocked or (m.status == "held" and not mod and m.author_id != viewer_id):
+                        # Remove previously visible content without revealing the hidden body or author.
+                        yield _sse("update", {"id": m.id, "status": "removed", "body": "", "reply_to": None,
+                                              "reactions": [], "can_edit": False, "can_delete": False})
+                    else:
+                        yield _sse("update", message_out(s2, m, viewer))
+                # Advance only through processed rows; jumping to MAX drops batches over 100.
             if time.monotonic() - last_ping > 15:
                 last_ping = time.monotonic()
                 yield _sse("ping", {"t": int(time.time())})

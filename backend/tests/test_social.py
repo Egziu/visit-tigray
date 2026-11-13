@@ -236,3 +236,54 @@ def test_export_and_erasure_cover_social_content(visitor, staff, client, spaces_
     assert db.get(JournalPost, pid) is None and db.get(SpaceMessage, mine["id"]) is None
     survivor = next(m for m in client.get(url).json()["items"] if m["id"] == reply["id"])
     assert survivor["reply_to"] is None and survivor["body"] == "a reply"
+
+
+def test_reply_preview_hides_held_and_blocked_messages(visitor, client, spaces_seeded, db):
+    from app.modules.social.models import SpaceMessage
+
+    author, respondent = visitor(name="Author"), visitor(name="Respondent")
+    for v in (author, respondent):
+        v.post("/api/spaces/travellers-lounge/join")
+    url = "/api/spaces/travellers-lounge/channels/general/messages"
+    original = author.post(url, json={"body": "Private after moderation"}).json()
+    reply = respondent.post(url, json={"body": "A visible reply", "reply_to": original["id"]}).json()
+    msg = db.get(SpaceMessage, original["id"])
+    msg.status = "held"
+    db.commit()
+    rows = client.get(url).json()["items"]
+    assert next(m for m in rows if m["id"] == reply["id"])["reply_to"] is None
+    assert "Private after moderation" not in json.dumps(rows)
+    # The author may still inspect their own held content.
+    assert next(m for m in author.get(url).json()["items"] if m["id"] == reply["id"])["reply_to"] is not None
+    msg.status = "visible"
+    db.commit()
+    handle = author.get("/api/me/profile").json()["handle"]
+    respondent.post(f"/api/creators/{handle}/block")
+    rows = respondent.get(url).json()["items"]
+    assert next(m for m in rows if m["id"] == reply["id"])["reply_to"] is None
+
+
+def test_stream_redacts_updates_from_newly_blocked_author(visitor, spaces_seeded, monkeypatch):
+    from app.modules.social import router as social
+
+    author, viewer = visitor(name="Author"), visitor(name="Viewer")
+    for v in (author, viewer):
+        v.post("/api/spaces/travellers-lounge/join")
+    base = "/api/spaces/travellers-lounge/channels/general"
+    msg = author.post(base + "/messages", json={"body": "Before block"}).json()
+    handle = author.get("/api/me/profile").json()["handle"]
+    changed = False
+
+    def mutate(_):
+        nonlocal changed
+        if not changed:
+            changed = True
+            viewer.post(f"/api/creators/{handle}/block")
+            author.patch(f"/api/space-messages/{msg['id']}", json={"body": "Hidden edited body"})
+
+    monkeypatch.setattr(social, "STREAM_SECONDS", 0.4)
+    monkeypatch.setattr(social.time, "sleep", mutate)
+    result = viewer.get(base + f"/stream?after={msg['id']}")
+    assert result.status_code == 200
+    assert "Hidden edited body" not in result.text
+    assert '"status": "removed"' in result.text
