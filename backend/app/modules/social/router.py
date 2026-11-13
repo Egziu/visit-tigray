@@ -810,7 +810,9 @@ def stream(slug: str, channel: str, request: Request, after: int = 0, db: Sessio
                     if m.author_id in blocked or (m.status == "held" and not mod and m.author_id != viewer_id):
                         # Remove previously visible content without revealing the hidden body or author.
                         yield _sse("update", {"id": m.id, "status": "removed", "body": "", "reply_to": None,
-                                              "reactions": [], "can_edit": False, "can_delete": False})
+                                              "author": {"handle": None, "display_name": "", "role": None},
+                                              "created_at": m.created_at.isoformat(), "edited_at": None,
+                                              "can_edit": False, "can_delete": False, "reactions": []})
                     else:
                         yield _sse("update", message_out(s2, m, viewer))
                 # Advance only through processed rows; jumping to MAX drops batches over 100.
