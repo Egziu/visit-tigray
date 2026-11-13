@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from app.core.db import get_db, utcnow
 from app.core.errors import AppError, not_found
 from app.core.i18n import norm_locale, pick
+from app.core.pdf import set_body_font
 from app.core.security import rate_limit
 from app.modules.audit import service as audit
 from app.modules.awards.models import Competition, CompetitionCategory, Entry, JudgeAssignment, Score, Sponsor, WinnerProposal
@@ -209,12 +210,7 @@ def certificate(slug: str, entry_id: uuid.UUID, p: Principal = Depends(current_p
     kind = f"Winner — rank {w.rank}" if w else "Certificate of participation"
     doc = FPDF(orientation="L", format="A4")
     doc.add_page()
-    font = "/usr/share/fonts/truetype/freefont/FreeSerif.ttf"
-    try:
-        doc.add_font("Body", "", font)
-        doc.set_font("Body", size=28)
-    except (FileNotFoundError, RuntimeError):  # pragma: no cover
-        doc.set_font("Helvetica", size=28)
+    set_body_font(doc, size=28)
     doc.ln(30)
     doc.cell(0, 14, pick(c.title_i18n, "en")[0], align="C", new_x="LMARGIN", new_y="NEXT")
     doc.set_font_size(20)

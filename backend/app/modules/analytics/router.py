@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 from app.core.db import get_db, utcnow
 from app.core.errors import AppError
 from app.core.ethiopic import fold_for_search
+from app.core.pdf import set_body_font
 from app.core.security import rate_limit
 from app.modules.analytics.models import AnalyticsEvent, TourismMeasurement
 from app.modules.audit import service as audit
@@ -195,11 +196,7 @@ def export(request: Request, format: Literal["csv", "xlsx", "pdf"] = "csv", frm:
     from fpdf import FPDF
     doc = FPDF()
     doc.add_page()
-    try:
-        doc.add_font("Body", "", "/usr/share/fonts/truetype/freefont/FreeSerif.ttf")
-        doc.set_font("Body", size=10)
-    except (FileNotFoundError, RuntimeError):  # pragma: no cover
-        doc.set_font("Helvetica", size=10)
+    set_body_font(doc, size=10)
     for line in provenance:
         doc.multi_cell(doc.epw, 5, line, new_x="LMARGIN", new_y="NEXT")
     doc.ln(4)
