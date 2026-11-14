@@ -47,7 +47,7 @@ cd backend && .venv/bin/pytest          # 107 tests against a throwaway PostgreS
 * Architecture: [System](docs/SYSTEM_ARCHITECTURE.md) · [Database](docs/DATABASE_DESIGN.md) · [Local AI](docs/LOCAL_AI_ARCHITECTURE.md) · [Offline](docs/OFFLINE_ARCHITECTURE.md) · [ADRs](docs/adr/) · [OpenAPI](docs/api/openapi.json)
 * Governance: [Knowledge governance](docs/KNOWLEDGE_GOVERNANCE.md) · [AI model evaluation](docs/AI_MODEL_EVALUATION.md) · [Threat model](docs/THREAT_MODEL.md) · [Privacy](docs/PRIVACY_AND_DATA_GOVERNANCE.md) · [Security policy](SECURITY.md)
 * Operations: [Deployment](docs/DEPLOYMENT.md) · [Backup & recovery](docs/BACKUP_AND_RECOVERY.md) · [Bureau user guide](docs/BUREAU_USER_GUIDE.md)
-* Quality: [Test report](docs/TEST_REPORT.md) · [Release readiness](docs/RELEASE_READINESS.md) · [Changelog](CHANGELOG.md)
+* Quality: [Test plan](docs/TEST_PLAN.md) · [Test report](docs/TEST_REPORT.md) · [Release readiness](docs/RELEASE_READINESS.md) · [Changelog](CHANGELOG.md)
 * Contributors and AI agents: read [`CLAUDE.md`](CLAUDE.md) first.
 
 ## Principles

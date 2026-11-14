@@ -7,6 +7,7 @@ Audit date: 2026-11-12 · Auditor: AI engineering agent (Claude Code) · Commit 
 | Step | Result |
 |---|---|
 | Archive `visit-tigray-serk-v0.1.zip` inspected | 25 entries under a single `visit-tigray-serk/` prefix |
+| Archive extracted (2026-11-14) | All 25 entries now live as plain files in `legacy/prototype-v0.1/`; the zip was removed from git |
 | Path-traversal check | No absolute paths, no `..` segments — safe |
 | Comparison with working tree | All 18 files byte-identical to the archive except `README.md` (archive README preserved as `docs/PROTOTYPE_V0.1_README.md`) |
 | Git history | Preserved (`cc6ca5a`, `6fed7cb`); extraction committed as `63fdb83` |
