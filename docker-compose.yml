@@ -1,0 +1,146 @@
+# Visit Tigray — reproducible development / initial-deployment stack.
+#   docker compose up -d                       core: db, redis, api, worker, web
+#   docker compose --profile ai up -d          + Ollama (local inference)
+#   docker compose --profile sso up -d         + Keycloak (OIDC)
+#   docker compose --profile scan up -d        + ClamAV (malware scanning)
+#   docker compose --profile storage up -d     + MinIO (S3-compatible object storage)
+#   docker compose --profile observability up -d   + Prometheus + Grafana
+# Copy .env.example to .env and set every secret first. Never commit .env.
+name: visit-tigray
+
+x-api-env: &api-env
+  ENVIRONMENT: ${ENVIRONMENT:-development}
+  DATABASE_URL: postgresql+psycopg://vt_app:${VT_APP_PASSWORD:?set VT_APP_PASSWORD}@db:5432/visit_tigray
+  DATABASE_MIGRATION_URL: postgresql+psycopg://vt_migrator:${VT_MIGRATOR_PASSWORD:?set VT_MIGRATOR_PASSWORD}@db:5432/visit_tigray
+  REDIS_URL: redis://redis:6379/0
+  SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY}
+  PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:3000}
+  ALLOWED_HOSTS: '["localhost","127.0.0.1","api"]'
+  CORS_ORIGINS: '["http://localhost:3000"]'
+  REQUIRE_STAFF_MFA: ${REQUIRE_STAFF_MFA:-true}
+  AI_DEFAULT_MODE: ${AI_DEFAULT_MODE:-fully_local}
+  OLLAMA_BASE_URL: http://ollama:11434
+  LOCAL_CHAT_MODEL: ${LOCAL_CHAT_MODEL:-qwen2.5:7b-instruct-q4_K_M}
+  EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-hashing}
+  CLAMD_HOST: ${CLAMD_HOST:-}
+  OIDC_ISSUER: ${OIDC_ISSUER:-}
+  OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
+  OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
+  OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI:-}
+  SMTP_HOST: ${SMTP_HOST:-}
+  MEDIA_ROOT: /srv/var/media
+
+services:
+  db:
+    build: ./infra/postgres
+    environment:
+      POSTGRES_DB: visit_tigray
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      VT_APP_PASSWORD: ${VT_APP_PASSWORD}
+      VT_MIGRATOR_PASSWORD: ${VT_MIGRATOR_PASSWORD}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d visit_tigray"]
+      interval: 5s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+    restart: unless-stopped
+
+  migrate:
+    build: { context: ., dockerfile: infra/docker/api.Dockerfile }
+    environment: *api-env
+    command: ["sh", "-c", "alembic upgrade head && psql \"$${DATABASE_MIGRATION_URL/+psycopg/}\" -f /srv/backend/../infra/postgres/post-migrate-grants.sql || true"]
+    volumes: [./infra/postgres/post-migrate-grants.sql:/srv/infra/postgres/post-migrate-grants.sql:ro]
+    depends_on: { db: { condition: service_healthy } }
+    restart: "no"
+
+  api:
+    build: { context: ., dockerfile: infra/docker/api.Dockerfile }
+    environment: *api-env
+    volumes: [media:/srv/var/media]
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+    restart: unless-stopped
+
+  worker:
+    build: { context: ., dockerfile: infra/docker/api.Dockerfile }
+    environment: *api-env
+    command: ["python", "-m", "app.worker"]
+    volumes: [media:/srv/var/media]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    restart: unless-stopped
+
+  web:
+    build: { context: ., dockerfile: infra/docker/web.Dockerfile }
+    environment:
+      API_ORIGIN: http://api:8000
+      NEXT_PUBLIC_MAP_STYLE_URL: ${NEXT_PUBLIC_MAP_STYLE_URL:-}
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on: [api]
+    restart: unless-stopped
+
+  ollama:
+    profiles: [ai]
+    image: ollama/ollama:0.12.6
+    volumes: [ollama:/root/.ollama]   # model weights live here, never in git
+    # GPU: uncomment on hosts with the NVIDIA container toolkit
+    # deploy: { resources: { reservations: { devices: [{ driver: nvidia, count: all, capabilities: [gpu] }] } } }
+    restart: unless-stopped
+
+  keycloak:
+    profiles: [sso]
+    image: quay.io/keycloak/keycloak:26.0
+    command: ["start-dev"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?set KEYCLOAK_ADMIN_PASSWORD}
+    ports: ["127.0.0.1:8080:8080"]
+
+  clamav:
+    profiles: [scan]
+    image: clamav/clamav:1.4
+    restart: unless-stopped
+
+  minio:
+    profiles: [storage]
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-vt-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD}
+    volumes: [minio:/data]
+    ports: ["127.0.0.1:9001:9001"]
+
+  prometheus:
+    profiles: [observability]
+    image: prom/prometheus:v3.0.1
+    volumes: [./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro]
+    ports: ["127.0.0.1:9090:9090"]
+
+  grafana:
+    profiles: [observability]
+    image: grafana/grafana:11.3.1
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD}
+    volumes:
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports: ["127.0.0.1:3001:3000"]
+
+volumes:
+  pgdata:
+  media:
+  ollama:
+  minio:

@@ -1,0 +1,16 @@
+{
+  "name": "Visit Tigray",
+  "short_name": "Visit Tigray",
+  "description": "Discover. Experience. Remember. Pre-release — not an official government service.",
+  "start_url": "/en",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8f2e9",
+  "theme_color": "#0a4424",
+  "lang": "en",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

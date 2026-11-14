@@ -1,0 +1,17 @@
+{
+  "title": "Visit Tigray — API & TIE",
+  "uid": "visit-tigray-main",
+  "schemaVersion": 39,
+  "panels": [
+    {"type": "timeseries", "title": "HTTP p95 latency by route (s)", "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+     "targets": [{"expr": "histogram_quantile(0.95, sum by (le, route) (rate(vt_http_request_seconds_bucket[5m])))"}]},
+    {"type": "timeseries", "title": "HTTP 5xx rate", "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+     "targets": [{"expr": "sum(rate(vt_http_request_seconds_count{status=~\"5..\"}[5m]))"}]},
+    {"type": "timeseries", "title": "AI inference p95 (s) by provider/mode", "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+     "targets": [{"expr": "histogram_quantile(0.95, sum by (le, provider, mode) (rate(vt_ai_inference_seconds_bucket[5m])))"}]},
+    {"type": "timeseries", "title": "TIE answers by confidence", "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+     "targets": [{"expr": "sum by (confidence) (rate(vt_tie_answers_total[15m]))"}]},
+    {"type": "stat", "title": "Rate-limited requests (15m)", "gridPos": {"x": 0, "y": 16, "w": 6, "h": 4},
+     "targets": [{"expr": "sum(increase(vt_rate_limited_total[15m]))"}]}
+  ]
+}
